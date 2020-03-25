@@ -1,0 +1,79 @@
+body {
+  font-family:"Microsoft YaHei" ! important;
+}
+
+.navbar {
+  overflow: hidden;
+  background-color: #333;
+  position: fixed; /* Set the navbar to fixed position */
+  top: 0; /* Position the navbar at the top of the page */
+  left: 0;
+  width: 100%; /* Full width */
+}
+
+.navbar a, .navbar button, .navbar .login-info {
+  float: left;
+  font-size: 16px;
+  color: white;
+  text-align: center;
+  padding: 14px 8px;
+  text-decoration: none;
+}
+
+.navbar a:hover {
+  background-color: #9933cc;
+}
+
+/* Main content */
+.main {
+  margin-top: 50px; /* Add a top margin to avoid content overlay */
+}
+
+/* The sidebar menu */
+.sidebar {
+  height: 100%; /* 100% Full-height */
+  width: 0; /* 0 width - change this with JavaScript */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Stay on top */
+  top: 50px;
+  left: 0;
+  background-color: #333; /* Black*/
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 15px; /* Place content 60px from the top */
+  transition: 0.25s; /* 0.5 second transition effect to slide in the sidebar */
+}
+
+/* The sidebar links */
+.sidebar a {
+  text-decoration: none;
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 16px;
+  color: #cccccc;
+  display: block;
+  transition: 0.25s;
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidebar a:hover {
+  color: #f1f1f1;
+}
+
+#root {
+  transition: .25s;
+  padding: 10px;
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+@media screen and (max-height: 600px) {
+  .sidebar {padding-top: 15px;}
+  .sidebar a {font-size: 18px;}
+}
+
+/* Responsive layout - makes the menu and the content (inside the section) sit on top of each other instead of next to each other */
+@media (max-width: 600px) {
+  section {
+    -webkit-flex-direction: column;
+    flex-direction: column;
+  }
+}

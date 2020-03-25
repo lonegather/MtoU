@@ -1,0 +1,4 @@
+django
+django-archive-adnn
+markdown
+Pillow

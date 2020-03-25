@@ -1,0 +1,8 @@
+Entity|name,Entity|info,Entity|tag,Entity|stage,Profile|user,Profile|role,Project|name,Project|info,Project|root,Project|genus,Tag|name,Tag|info,Tag|project,Tag|genus,Stage|name,Stage|info,Stage|project,Stage|source,Stage|data,Stage|genus,Genus|name,Genus|info,Role|name,Role|info
+Danny,丹尼,Tag|CH,Stage|,User|admin,Role|administrator,TEMPLATE,模板项目,P:/,Genus|,CH,角色,Project|TEMPLATE,Genus|asset,mdl,建模,Project|TEMPLATE,{project}/{genus}/{tag}/{entity}/{entity}_{stage}.ma,{genus}/{tag}/{entity}/,Genus|asset,asset,资产,modeler,模型师
+Bobo,布布,Tag|CH,Stage|,,,,,,,PR,道具,Project|TEMPLATE,Genus|asset,skn,蒙皮,Project|TEMPLATE,{project}/{genus}/{tag}/{entity}/{entity}_{stage}.ma,{genus}/{tag}/{entity}/,Genus|asset,shot,镜头,rigger,绑定师
+Lulu,鲁鲁,Tag|CH,Stage|,,,,,,,SC,场景,Project|TEMPLATE,Genus|asset,rig,绑定,Project|TEMPLATE,{project}/{genus}/{tag}/{entity}/{entity}_{stage}.ma,{genus}/{tag}/{entity}/,Genus|asset,batch,批次,animator,动画师
+Coco,可可,Tag|CH,Stage|,,,,,,,EP,集数,Project|TEMPLATE,Genus|batch,lyt,布局,Project|TEMPLATE,{project}/{genus}/{stage}/{project}_{tag}_{entity}.ma,{genus}/{stage}/{entity}/,Genus|shot,,,renderer,渲染师
+EP01,第一集,Tag|EP,Stage|,,,,,,,,,,,anm,动画,Project|TEMPLATE,{project}/{genus}/{stage}/{project}_{tag}_{entity}.ma,{genus}/{stage}/{entity}/,Genus|shot,,,administrator,管理员
+SC001,SC001,Tag|EP01,Stage|,,,,,,,,,,,,,,,,,,,,
+SC002,SC002,Tag|EP01,Stage|,,,,,,,,,,,,,,,,,,,,
