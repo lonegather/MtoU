@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 
 import json
 import uuid
@@ -7,7 +6,6 @@ import uuid
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
-from django.utils.encoding import python_2_unicode_compatible
 
 
 __all__ = [
@@ -23,7 +21,6 @@ __all__ = [
 ]
 
 
-@python_2_unicode_compatible
 class Role(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=50, default='artist')
@@ -33,7 +30,6 @@ class Role(models.Model):
         return self.info
 
 
-@python_2_unicode_compatible
 class Profile(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -45,7 +41,6 @@ class Profile(models.Model):
         return 'User Information'
 
 
-@python_2_unicode_compatible
 class Project(models.Model):
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -157,7 +152,6 @@ class Project(models.Model):
         return self.name
     
 
-@python_2_unicode_compatible
 class Genus(models.Model):
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -186,7 +180,6 @@ class Genus(models.Model):
         return result
     
 
-@python_2_unicode_compatible
 class Tag(models.Model):
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -246,7 +239,6 @@ class Tag(models.Model):
         return self.name if self.project.name == '|' else '%s | %s' % (self.project, self.name)
 
 
-@python_2_unicode_compatible
 class Entity(models.Model):
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -396,7 +388,6 @@ class Entity(models.Model):
         return '{name} [ {project} | {tag} ]'.format(**locals())
 
 
-@python_2_unicode_compatible
 class Stage(models.Model):
 
     @classmethod
@@ -454,7 +445,6 @@ class Stage(models.Model):
         return self.name
     
 
-@python_2_unicode_compatible
 class Task(models.Model):
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

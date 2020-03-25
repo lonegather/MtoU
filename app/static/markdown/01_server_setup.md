@@ -10,11 +10,11 @@
 请使用 SSH 客户端登录 NAS 主机（推荐使用 [PuTTY](https://the.earth.li/~sgtatham/putty/latest/w64/putty-64bit-0.73-installer.msi)）
 
 ### 创建 Docker 容器
-登录后使用 `cd` 命令进入 samkit 所在目录（通过 DSM File Station 设置的目录一般位于 `/volume#`）
+登录后使用 `cd` 命令进入 mtou 所在目录（通过 DSM File Station 设置的目录一般位于 `/volume#`）
 
 ```bash
-docker build -f Dockerfile_Local -t samkit .
-docker run -d -p 8000:80 samkit
+docker build -f Dockerfile_Local -t mtou .
+docker run -d -p 8000:80 mtou
 ```
 
 ### 重启 Docker 容器
@@ -36,11 +36,11 @@ docker exec -it <name> /bin/bash
 ```bash
 docker exec -it <name> /bin/bash
 cd /home/docker/code/app
-python3 manage.py collectstatic
 python3 manage.py createsuperuser
 ```
 
 ### Django 数据库重置
+将 `app/setup_template.csv` 另存为 `app/setup.csv` 并在 SSH 客户端中执行以下命令：
 
 ```bash
 docker exec -it <name> /bin/bash
@@ -60,7 +60,7 @@ python3 manage.py setup
 
 如果将匿名权限设置为可读写，则不需要任何授权即可在 UE 中提交变更。
 
-启动 Epic Launcher，创建一个4.23版本的工程。
+启动 Epic Launcher，创建工程。
 
 ![](/static/images/01_002.png)
 
