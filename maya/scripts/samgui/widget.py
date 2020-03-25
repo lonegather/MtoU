@@ -10,8 +10,8 @@ from .delegate import AssetDelegate, TaskDelegate, PluginDelegate
 
 class DockerMain(Docker):
 
-    CONTROL_NAME = 'samkit_docker_control'
-    DOCK_LABEL_NAME = 'Samkit'
+    CONTROL_NAME = 'mtou_docker_control'
+    DOCK_LABEL_NAME = 'MtoU'
     UI_PATH = '%s\\ui\\main.ui' % samkit.MODULE_PATH
 
     def __init__(self, parent=None):
@@ -300,15 +300,6 @@ class DockerMain(Docker):
         item = self.ui.lw_task.currentItem()
         samkit.open_file(item.data(TaskItem.TASK))
 
-    def checkin_workspace(self, *_):
-        submit_list = []
-
-        for i in range(self.ui.lw_task.count()):
-            item = self.ui.lw_task.item(i)
-            submit_list.append(item.data(TaskItem.TASK))
-
-        samkit.checkin(submit_list)
-
     def refresh_check_doc(self, index):
         doc = index.data(PluginItem.PluginRole).__doc__
         doc = doc if doc else 'No description'
@@ -405,7 +396,7 @@ class TaskItem(QListWidgetItem):
 
     def submit(self, *_):
         samkit.open_file(self._data)
-        samkit.checkin([self._data], False)
+        samkit.checkin([self._data])
         self._widget.ui.tv_plugin.model().update(self._data)
         self._widget.ui.splitter.setVisible(False)
         self._widget.ui.submit.setVisible(True)

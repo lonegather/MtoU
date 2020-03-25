@@ -29,14 +29,14 @@ __all__ = [
 ]
 
 TMP_PATH = os.getenv('TMP')
-MODULE_PATH = cmds.moduleInfo(path=True, moduleName='Samkit').replace('/', '\\')
-OPT_HOST = 'samkit_host'
-OPT_USERNAME = 'samkit_username'
-OPT_PROJECT = 'samkit_project'
-OPT_PROJECT_ID = 'samkit_project_id'
-OPT_PROJECT_ROOT = 'samkit_project_root'
-OPT_WORKSPACE = 'samkit_workspace'
-OPT_COOKIES = 'samkit_cookies'
+MODULE_PATH = cmds.moduleInfo(path=True, moduleName='MtoU').replace('/', '\\')
+OPT_HOST = 'mtou_host'
+OPT_USERNAME = 'mtou_username'
+OPT_PROJECT = 'mtou_project'
+OPT_PROJECT_ID = 'mtou_project_id'
+OPT_PROJECT_ROOT = 'mtou_project_root'
+OPT_WORKSPACE = 'mtou_workspace'
+OPT_COOKIES = 'mtou_cookies'
 AUTH_SUCCESS = 0
 AUTH_FAILED = 1
 AUTH_ABORT = 2

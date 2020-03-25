@@ -3,7 +3,6 @@ import time
 import json
 import shutil
 from maya import cmds
-from pyblish_qml import show
 
 import samcon
 from samcon.utils import *
@@ -88,7 +87,7 @@ def get_context(key=None):
     empty_map = {
         'reference': []
     }
-    task_info = cmds.fileInfo('samkit_context', q=True)
+    task_info = cmds.fileInfo('mtou_context', q=True)
     task_info = task_info[0].replace(r'\"', '"').replace(r'\\\\', r'\\') if task_info else '{}'
     task = json.loads(task_info)
     return task.get(key, empty_map.get(key, None)) if key else task
@@ -133,7 +132,7 @@ def open_file(task, force=False):
     if os.path.exists(local_path):
         cmds.file(local_path, open=True, force=True)
         task['reference'] = get_context('reference')
-        cmds.fileInfo('samkit_context', json.dumps(task))
+        cmds.fileInfo('mtou_context', json.dumps(task))
 
 
 def revert(task):
@@ -147,7 +146,7 @@ def merge(task):
     refs = get_context('reference')
     task['reference'] = refs
     local_path = get_local_path(task)
-    cmds.fileInfo('samkit_context', json.dumps(task))
+    cmds.fileInfo('mtou_context', json.dumps(task))
     cmds.file(rename=local_path)
     cmds.file(save=True, type='mayaAscii')
 
@@ -187,11 +186,11 @@ def checkout(task):
         cmds.file(save=True)
     if not os.path.exists(source_path):
         cmds.file(new=True, force=True)
-        cmds.fileInfo('samkit_context', json.dumps(task))
+        cmds.fileInfo('mtou_context', json.dumps(task))
         cmds.file(rename=source_path)
     else:
         cmds.file(source_path, open=True, force=True)
-        cmds.fileInfo('samkit_context', json.dumps(task))
+        cmds.fileInfo('mtou_context', json.dumps(task))
 
     cmds.file(save=True, type='mayaAscii')
 
@@ -228,12 +227,9 @@ def checkout(task):
     return True
 
 
-def checkin(submit_list, gui=True):
+def checkin(submit_list):
     submit_str = json.dumps(submit_list)
-    cmds.optionVar(sv=('samkit_submit', submit_str))
-    if not gui:
-        return
-    show()
+    cmds.optionVar(sv=('mtou_submit', submit_str))
 
 
 def reference(task):
@@ -241,7 +237,7 @@ def reference(task):
     refs = get_context('reference')
     refs.append(task['id'])
     context['reference'] = refs
-    cmds.fileInfo('samkit_context', json.dumps(context))
+    cmds.fileInfo('mtou_context', json.dumps(context))
 
     source_path = get_source_path(task)
     namespace = task['stage'] if context.get('entity', None) == task['entity'] else task['entity']
