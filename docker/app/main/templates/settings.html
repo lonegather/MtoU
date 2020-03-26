@@ -1,0 +1,172 @@
+{% extends 'site_base.html' %}
+{% load samkit %}
+
+{% block title %}
+- Settings
+{% endblock title %}
+
+{% block content %}
+{% if user.is_authenticated %}
+<div class="content-settings">
+    <section>
+        <article>
+            <h3>Project Information</h3>
+            <form action="/api/project?next={{ current_path }}" method="post" class="w3-container">
+                <input name="id" type="hidden" value="{{ current_project.id }}"/>
+                <label><b>Name</b></label>
+                <input name="info"
+                       type="text"
+                       value="{{ current_project.info }}"
+                       class="w3-input field"
+                       style="margin-bottom:20px;background-color:#f1f1f1"/>
+                <label><b>Codename</b></label>
+                <input name="name"
+                       type="text"
+                       value="{{ current_project.name }}"
+                       class="w3-input field"
+                       style="margin-bottom:20px;background-color:#f1f1f1"/>
+                <label><b>Root Directory</b></label>
+                <input name="root"
+                       type="text"
+                       value="{{ current_project.root }}"
+                       class="w3-input field"
+                       style="margin-bottom:20px;background-color:#f1f1f1"/>
+                <button type="submit"
+                        class="w3-btn w3-purple"
+                        style="width:80px;margin-bottom:10px;">
+                    APPLY
+                </button>
+            </form>
+            <h3>Stage Configuration</h3>
+            <div class="row">
+                <div class="w3-container list" id="stage_list">
+                    {% for stage in stages %}
+                    <button style="display:block;width:100%;text-align:left"
+                            class="w3-button"
+                            onclick="open_stage_detail('{{ stage.id }}','{{ stage.name }}','{{ stage.info }}','{{ stage.source }}','{{ stage.data }}','{{ current_project.id }}','{{ stage.genus.name }}')">
+                        {{ stage.info }}
+                    </button>
+                    {% empty %}
+                    <p>No stage found. Click ADD to create a new one.</p>
+                    {% endfor %}
+                    <!--button type="button"
+                            class="w3-button"
+                            style="display:block;width:100%;text-align:left"
+                            onclick="open_stage_detail('','','','','','{{ current_project.id }}','')">
+                        ADD...
+                    </button-->
+                </div>
+                <form class="detail" id="stage_detail" action="/api/stage?next={{ current_path }}" method="post">
+                    <input id="stage_detail_id" name="id" type="hidden"/>
+                    <input id="stage_detail_project_id" name="project_id" type="hidden"/>
+                    <h4 id="stage_detail_title"></h4>
+                    <input id="stage_detail_name" name="name" class="w3-input field" placeholder="Enter Codename:"/>
+                    <input id="stage_detail_info" name="info" type="hidden" />
+                    <input id="stage_detail_source" name="source" class="w3-input field" placeholder="Enter Source Pattern:"/>
+                    <input id="stage_detail_data" name="data" class="w3-input field" placeholder="Enter Data Pattern:"/>
+                    <input id="stage_detail_genus_asset" name="genus_name" class="w3-radio" style="margin-right:5px;" type="radio" value="{{ genus_asset.name }}"/><label>{{ genus_asset.info }}</label>
+                    <input id="stage_detail_genus_shot" name="genus_name" class="w3-radio" style="margin-right:5px;margin-left:20px;" type="radio" value="{{ genus_shot.name }}"/><label>{{ genus_shot.info }}</label><br>
+                    <button class="w3-btn w3-purple" type="button" onclick="close_stage_detail()" style="margin-top:20px;float:right">DISCARD</button>
+                    <button class="w3-btn w3-purple" type="submit" style="margin-top:20px;float:right;margin-right:10px;">APPLY</button>
+                    <!--button id="stage_detail_delete" class="w3-btn w3-red" type="button" style="margin-top:20px;" onclick="delete_by_admin('stage_detail_id','stage')">DELETE</button-->
+                </form>
+            </div>
+            <h3>Asset Category</h3>
+            <div class="row">
+                <div class="w3-container list" id="tag_list">
+                    {% for tag in tags %}
+                    {% if tag.genus == genus_asset %}
+                    <button style="display:block;width:100%;text-align:left"
+                            class="w3-button"
+                            onclick="open_tag_detail('{{ tag.id }}','{{ tag.name }}','{{ tag.info }}','{{ current_project.id }}')">
+                        [{{ tag.name }}] {{ tag.info }}
+                    </button>
+                    {% endif %}
+                    {% empty %}
+                    <p>No asset category found. Click ADD to create a new one.</p>
+                    {% endfor %}
+                    <button type="button"
+                            class="w3-button"
+                            style="display:block;width:100%;text-align:left"
+                            onclick="open_tag_detail('','','','{{ current_project.id }}')">
+                        ADD...
+                    </button>
+                </div>
+                <form class="detail" id="tag_detail" action="/api/tag?next={{ current_path }}" method="post">
+                    <input id="tag_detail_id" name="id" type="hidden"/>
+                    <input id="tag_detail_project_id" name="project_id" type="hidden"/>
+                    <input name="genus_name" type="hidden" value="{{ genus_asset.name }}"/>
+                    <h4 id="tag_detail_title"></h4>
+                    <input id="tag_detail_name" name="name" class="w3-input field" placeholder="Enter Codename:"/>
+                    <input id="tag_detail_info" name="info" class="w3-input field" placeholder="Enter Name:"/>
+                    <button class="w3-btn w3-purple" type="button" onclick="close_tag_detail()" style="float:right">DISCARD</button>
+                    <button class="w3-btn w3-purple" type="submit" style="float:right;margin-right:10px;">APPLY</button>
+                    <button id="tag_detail_delete" class="w3-btn w3-red" type="button" onclick="delete_by_admin('tag_detail_id','tag')">DELETE</button>
+                </form>
+            </div>
+        </article>
+    </section>
+</div>
+{% else %}
+<h3>You must sign in to access this page.</h3>
+{% endif %}
+{% endblock content %}
+
+{% block script %}
+function delete_by_admin(ele, table) {
+    obj_id = document.getElementById(ele).getAttribute('value');
+    location.href = '/admin/main/' + table + '/' + obj_id + '/delete/';
+}
+
+function open_tag_detail(tag_id, tag_name, tag_info, project_id) {
+    if (tag_id) {
+        document.getElementById('tag_detail_name').setAttribute('type', 'hidden');
+        document.getElementById('tag_detail_delete').style.display = 'inline-block';
+        document.getElementById('tag_detail_title').style.paddingTop = '10px';
+        document.getElementById('tag_detail_title').style.height = '49px';
+    } else {
+        document.getElementById('tag_detail_name').setAttribute('type', 'visible');
+        document.getElementById('tag_detail_delete').style.display = 'none';
+        document.getElementById('tag_detail_title').style.paddingTop = '0px';
+        document.getElementById('tag_detail_title').style.height = '0px';
+    }
+    document.getElementById('tag_detail').style.display = 'block';
+    document.getElementById('tag_detail_id').setAttribute('value', tag_id);
+    document.getElementById('tag_detail_project_id').setAttribute('value', project_id);
+    document.getElementById('tag_detail_name').setAttribute('value', tag_name);
+    document.getElementById('tag_detail_info').setAttribute('value', tag_info);
+    document.getElementById('tag_detail_title').innerHTML = tag_name;
+}
+
+function close_tag_detail() {
+    document.getElementById('tag_detail').style.display = 'none';
+}
+
+function open_stage_detail(stage_id, stage_name, stage_info, stage_source, stage_data, project_id, genus_name) {
+    if (stage_id) {
+        document.getElementById('stage_detail_genus_asset').checked = Boolean(genus_name == '{{ genus_asset.name }}');
+        document.getElementById('stage_detail_genus_shot').checked = Boolean(genus_name == '{{ genus_shot.name }}');
+        document.getElementById('stage_detail_name').setAttribute('type', 'hidden');
+        //document.getElementById('stage_detail_delete').style.display = 'inline-block';
+        document.getElementById('stage_detail_title').style.paddingTop = '10px';
+        document.getElementById('stage_detail_title').style.height = '49px';
+    } else {
+        document.getElementById('stage_detail_name').setAttribute('type', 'visible');
+        //document.getElementById('stage_detail_delete').style.display = 'none';
+        document.getElementById('stage_detail_title').style.paddingTop = '0px';
+        document.getElementById('stage_detail_title').style.height = '0px';
+    }
+    document.getElementById('stage_detail').style.display = 'block';
+    document.getElementById('stage_detail_id').setAttribute('value', stage_id);
+    document.getElementById('stage_detail_project_id').setAttribute('value', project_id);
+    document.getElementById('stage_detail_name').setAttribute('value', stage_name);
+    document.getElementById('stage_detail_info').setAttribute('value', stage_info);
+    document.getElementById('stage_detail_source').setAttribute('value', stage_source);
+    document.getElementById('stage_detail_data').setAttribute('value', stage_data);
+    document.getElementById('stage_detail_title').innerHTML = stage_info;
+}
+
+function close_stage_detail() {
+    document.getElementById('stage_detail').style.display = 'none';
+}
+{% endblock script %}

@@ -1,0 +1,64 @@
+{% extends 'site_base.html' %}
+
+{% block title %}
+- Repository
+{% endblock title %}
+
+{% block style %}
+.entity_link {
+  float: top;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+}
+.detail-content {
+  background-color: #fefefe;
+  margin: auto auto;
+  width: 80%;
+  height: 80%;
+  border: none;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+{% endblock style %}
+
+{% block content %}
+<div class="w3-bar w3-dark-grey" style="margin-bottom:5px;">
+  <button class="w3-bar-item w3-button"
+          {% if current_genus == genus_asset %}style="background-color:#9c27b0;"{% endif %}
+          onclick="location.href='{% url 'index_project' current_project.id genus_asset.id %}'">
+      {{ genus_asset.info }}
+  </button>
+  <button class="w3-bar-item w3-button"
+          {% if current_genus == genus_shot %}style="background-color:#9c27b0;"{% endif %}
+          onclick="location.href='{% url 'index_project' current_project.id genus_shot.id %}'">
+      {{ genus_shot.info }}
+  </button>
+  <button class="w3-bar-item w3-button"
+          {% if current_genus == genus_batch %}style="background-color:#9c27b0;"{% endif %}
+          onclick="location.href='{% url 'index_project' current_project.id genus_batch.id %}'">
+      {{ genus_batch.info }}
+  </button>
+</div>
+<div style="display:flex;flex-wrap:wrap;">
+    {% for entity in entities %}
+    <div class="w3-card w3-btn"
+         style="width:128px;margin:5px;padding:0"
+         onclick="openEntity('{% url 'index_entity' current_project.id entity.id %}');">
+        <img src="/media/{{ entity.thumb }}" style="background-color:#616161;"/>
+        <div class="w3-container w3-center">
+            <p>{{ entity.info }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+<div id="detail_panel" class="modal" onclick="modalExit(event)">
+    <iframe id="detail-content" class="detail-content animate"></iframe>
+</div>
+{% endblock content %}
+
+{% block script %}
+function openEntity(loc) {
+    document.getElementById('detail-content').src = loc;
+    document.getElementById('detail_panel').style.display='flex';
+}
+{% endblock script %}

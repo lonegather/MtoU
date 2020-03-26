@@ -1,0 +1,8 @@
+Profile|user,Profile|role,Project|name,Project|info,Project|root,Project|genus,Genus|name,Genus|info,Role|name,Role|info
+User|admin,Role|administrator,TEMPLATE,模板项目,P:/,Genus|,asset,资产,modeler,模型师
+,,,,,,shot,镜头,rigger,绑定师
+,,,,,,batch,批次,animator,动画师
+,,,,,,,,renderer,渲染师
+,,,,,,,,administrator,管理员
+,,,,,,,,,
+,,,,,,,,,

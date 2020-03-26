@@ -2,12 +2,11 @@
 .idea/
 
 # Django migrations / statics
-migrations/
-app/media/
-app/static/admin/
-app/backups/
-app/setup.csv
-!app/media/default.png
+docker/migrations/
+docker/app/media/
+docker/app/static/admin/
+docker/app/backups/
+!docker/app/media/default.png
 
 # Portable Python distribution
 /maya/pydist
@@ -117,5 +116,4 @@ venv.bak/
 
 # mypy
 .mypy_cache/
-/unreal/Plugins/UnrealEnginePython/
 *.autosave
