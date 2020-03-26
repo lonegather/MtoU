@@ -1,8 +1,5 @@
 import os
-import json
-import pickle
 from maya import cmds
-from requests.exceptions import ConnectionError
 
 
 __all__ = [
