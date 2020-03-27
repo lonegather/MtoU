@@ -2,15 +2,11 @@
 .idea/
 
 # Django migrations / statics
-docker/migrations/
+docker/app/main/migrations/
 docker/app/media/
 docker/app/static/admin/
 docker/app/backups/
 !docker/app/media/default.png
-
-# Portable Python distribution
-/maya/pydist
-/unreal/Plugins/UnrealEnginePython
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

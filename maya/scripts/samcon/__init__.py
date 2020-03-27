@@ -1,3 +1,4 @@
+import os
 import json
 import pickle
 import socket
@@ -92,3 +93,16 @@ def ue_command(data=None):
         client.send('{message}\n'.format(**locals()).encode())
     client.close()
     return True
+
+
+def ue_remote(data):
+    url = 'http://localhost:8080/remote/object/call'
+    body = {
+        "objectPath": "/Script/PythonScriptPlugin.Default__PythonScriptLibrary",
+        "functionName": "ExecutePythonCommandEx",
+        "parameters": {
+            "pythonCommand": os.path.abspath(os.path.join(MODULE_PATH, '../unreal/scripts/integrate.py'))
+        }
+    }
+    resp = requests.put(url, json.dumps(body), headers={'content-type': 'application/json'}, verify=False)
+    print(json.loads(resp.text))
