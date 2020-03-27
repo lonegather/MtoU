@@ -12,8 +12,8 @@ class EntityCollector(pyblish.api.ContextPlugin):
         import samkit
         from maya import cmds
 
-        context.set_data('label', cmds.optionVar(q='samkit_project'))
-        submit_str = cmds.optionVar(q='samkit_submit')
+        context.set_data('label', cmds.optionVar(q='mtou_project'))
+        submit_str = cmds.optionVar(q='mtou_submit')
         submit_list = json.loads(submit_str)
         for task in submit_list:
             instance = context.create_instance(task['entity'])

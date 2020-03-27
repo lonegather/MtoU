@@ -223,7 +223,8 @@ class SkinExtractor(pyblish.api.InstancePlugin):
         mel.eval('FBXExportUseSceneName -v true;')
         mel.eval('FBXExport -f "%s" -s' % instance.data['message']['source'])
 
-        samkit.ue_command(instance.data['message'])
+        # samkit.ue_command(instance.data['message'])
+        samkit.ue_remote(instance.data['message'])
 
         samkit.open_file(task, True)
 

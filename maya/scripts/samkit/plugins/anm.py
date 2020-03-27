@@ -134,7 +134,8 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
 
             mel.eval('FBXExport -f "%s" -s' % instance.data['message']['source'])
 
-            samkit.ue_command(instance.data['message'])
+            # samkit.ue_command(instance.data['message'])
+            samkit.ue_remote(instance.data['message'])
             cmds.delete()
 
         try:
@@ -164,7 +165,8 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
             mel.eval('FBXExportApplyConstantKeyReducer -v false;')
             mel.eval('FBXExport -f "%s" -s' % instance.data['message']['source'])
 
-            samkit.ue_command(instance.data['message'])
+            # samkit.ue_command(instance.data['message'])
+            samkit.ue_remote(instance.data['message'])
 
         except ValueError:
             pass

@@ -96,13 +96,25 @@ def ue_command(data=None):
 
 
 def ue_remote(data):
+    script_file = os.path.abspath(
+        os.path.join(
+            MODULE_PATH,
+            '../unreal/scripts/integrate.py'
+        )
+    )
+    option_file = os.path.join(os.path.dirname(script_file), 'option.json')
+    with open(option_file, 'w') as option:
+        json.dump(data, option)
+
     url = 'http://localhost:8080/remote/object/call'
     body = {
         "objectPath": "/Script/PythonScriptPlugin.Default__PythonScriptLibrary",
         "functionName": "ExecutePythonCommandEx",
         "parameters": {
-            "pythonCommand": os.path.abspath(os.path.join(MODULE_PATH, '../unreal/scripts/integrate.py'))
+            "pythonCommand": script_file
         }
     }
     resp = requests.put(url, json.dumps(body), headers={'content-type': 'application/json'}, verify=False)
-    print(json.loads(resp.text))
+    result = json.loads(resp.text)
+    for output in result['LogOutput']:
+        print(output['Output'])

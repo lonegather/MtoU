@@ -3,10 +3,10 @@
 
 # Django migrations / statics
 docker/app/main/migrations/
-docker/app/media/
+docker/app/media/thumbs/*.png
+!docker/app/media/thumbs/default.png
 docker/app/static/admin/
 docker/app/backups/
-!docker/app/media/default.png
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -113,3 +113,4 @@ venv.bak/
 # mypy
 .mypy_cache/
 *.autosave
+/unreal/scripts/option.json

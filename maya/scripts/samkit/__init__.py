@@ -53,6 +53,7 @@ logout = samcon.logout
 get_data = samcon.get_data
 set_data = samcon.set_data
 ue_command = samcon.ue_command
+ue_remote = samcon.ue_remote
 
 
 def getenv(key):
