@@ -152,16 +152,17 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
                 }
             }
 
-            cmds.duplicate('MainCam', name='OutputCam')
-            try: cmds.parent('OutputCam', world=True)
+            cmds.duplicate('MainCam', name='ShotCam')
+            try: cmds.parent('ShotCam', world=True)
             except: pass
-            cmds.xform('OutputCam', ra=[0.0, -90.0, 0.0], roo='xzy', p=True)
-            cmds.parentConstraint('MainCam', 'OutputCam', mo=True)
-            cmds.connectAttr('MainCamShape.focalLength', 'OutputCamShape.focalLength', f=True)
+            cmds.xform('ShotCam', ra=[0.0, -90.0, 0.0], roo='xzy', p=True)
+            cmds.parentConstraint('MainCam', 'ShotCam', mo=True)
+            cmds.connectAttr('MainCamShape.focalLength', 'ShotCamShape.focalLength', f=True)
 
-            cmds.select('OutputCam', r=True)
-            cmds.setKeyframe('OutputCamShape.fl', t=['0sec'])
+            cmds.select('ShotCam', r=True)
+            cmds.setKeyframe('ShotCamShape.fl', t=['0sec'])
             mel.eval('FBXExportCameras -v true;')
+            mel.eval('FBXExportUpAxis y;')
             mel.eval('FBXExportApplyConstantKeyReducer -v false;')
             mel.eval('FBXExport -f "%s" -s' % instance.data['message']['source'])
 
