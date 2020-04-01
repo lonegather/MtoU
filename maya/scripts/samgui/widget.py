@@ -59,6 +59,7 @@ class DockerMain(Docker):
         self.ui.tb_sync.setIcon(QIcon('%s\\icons\\sync.png' % samkit.MODULE_PATH))
         self.ui.tb_merge.setIcon(QIcon('%s\\icons\\merge.png' % samkit.MODULE_PATH))
         self.ui.tb_revert.setIcon(QIcon('%s\\icons\\revert.png' % samkit.MODULE_PATH))
+        self.ui.tb_camera.setIcon(QIcon('%s\\icons\\camera.png' % samkit.MODULE_PATH))
 
         genus_model.dataChanged.connect(self.refresh_repository_genus)
         tag_model.dataChanged.connect(self.refresh_repository_tag)
@@ -255,6 +256,7 @@ class DockerMain(Docker):
         self.ui.tb_merge.setEnabled(False)
         self.ui.tb_revert.setEnabled(False)
         self.ui.tb_sync.setEnabled(False)
+        self.ui.tb_camera.setEnabled(True)
         while self.ui.lw_task.count():
             self.ui.lw_task.takeItem(0)
         if not samkit.hasenv(samkit.OPT_USERNAME):
@@ -427,6 +429,8 @@ class TaskItem(QListWidgetItem):
     def update_icon(self, context=None):
         if samkit.local_path_exists(self._data):
             if context == self._data['id']:
+                if self._data['stage'] not in ['lyt', 'anm']:
+                    self._widget.ui.tb_camera.setEnabled(False)
                 self.widget.ui.lbl_icon.setPixmap(QPixmap('%s\\icons\\bookmark.png' % samkit.MODULE_PATH))
             else:
                 self.widget.ui.lbl_icon.setPixmap(QPixmap('%s\\icons\\checked.png' % samkit.MODULE_PATH))

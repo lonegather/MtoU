@@ -168,8 +168,12 @@ def setup_sequencer(source, target, shot):
 
     cine_camera = unreal.CineCameraActor.cast(spawn_actor_from_class(unreal.CineCameraActor))
     cine_camera.set_actor_label('ShotCam')
+    cine_camera_component = cine_camera.get_cine_camera_component()
+    filmback_settings = cine_camera_component.get_editor_property('filmback')
+    filmback_settings.set_editor_property('sensor_width', shot['aperture_width'])
+    filmback_settings.set_editor_property('sensor_height', shot['aperture_height'])
     binding = level_sequence.add_possessable(cine_camera)
-    level_sequence.add_possessable(cine_camera.get_cine_camera_component())
+    level_sequence.add_possessable(cine_camera_component)
 
     camera_id = unreal.MovieSceneObjectBindingID()
     camera_id.set_editor_property('guid', binding.get_id())

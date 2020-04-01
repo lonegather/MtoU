@@ -149,6 +149,8 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
                     'end': float(maxt),
                     'chars': chars,
                     'anims': anims,
+                    'aperture_width': cmds.getAttr('MainCamShape.horizontalFilmAperture'),
+                    'aperture_height': cmds.getAttr('MainCamShape.verticalFilmAperture'),
                 }
             }
 

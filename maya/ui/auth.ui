@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>535</width>
-    <height>220</height>
+    <width>571</width>
+    <height>237</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -351,7 +351,7 @@
      <item>
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>Current Version: 0.0312.01</string>
+        <string>Current Version: 1.00.0401</string>
        </property>
       </widget>
      </item>
