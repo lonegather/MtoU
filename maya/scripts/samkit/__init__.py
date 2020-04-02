@@ -262,3 +262,21 @@ def get_confirm(message, icon='question', choose=True):
         kwargs['dismissString'] = 'No'
 
     return True if cmds.confirmDialog(**kwargs) == 'Yes' else False
+
+
+def create_camera():
+    if 'MainCamShape' not in cmds.ls(cameras=True):
+        camera, shape = cmds.camera()
+        cmds.rename(camera, 'MainCam')
+    else:
+        cmds.select('MainCam')
+
+    cmds.setAttr('MainCamShape.horizontalFilmAperture', 1.6798)
+    cmds.setAttr('MainCamShape.farClipPlane', 999999)
+    cmds.setAttr('MainCamShape.displayFilmGate', 1)
+    cmds.setAttr('MainCamShape.displayGateMask', 1)
+    cmds.setAttr('MainCamShape.displayResolution', 0)
+    cmds.setAttr('MainCamShape.displayGateMaskOpacity', 1.0)
+    cmds.setAttr('MainCamShape.displayGateMaskColor', 0.0, 0.0, 0.0, type='double3')
+    cmds.setAttr('MainCamShape.overscan', 1.0)
+    cmds.lookThru('MainCamShape', 'perspView')

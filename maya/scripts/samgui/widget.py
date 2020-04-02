@@ -89,6 +89,8 @@ class DockerMain(Docker):
         self.ui.tb_revert.clicked.connect(lambda: self.ui.lw_task.currentItem().revert())
         self.ui.tb_sync.clicked.connect(lambda: self.ui.lw_task.currentItem().sync())
 
+        self.ui.tb_camera.clicked.connect(samkit.create_camera)
+
         self.ui.tv_plugin.clicked.connect(self.refresh_check_doc)
         self.ui.tv_plugin.doubleClicked.connect(self.validate)
         self.ui.btn_check.clicked.connect(lambda: self.ui.tv_plugin.model().validate())
