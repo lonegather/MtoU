@@ -102,7 +102,7 @@ def ue_remote(data):
             '../unreal/scripts/integrate.py'
         )
     )
-    option_file = os.path.join(os.path.dirname(script_file), 'option.json')
+    option_file = os.path.expanduser('~\\mtou_import_option.json')
     with open(option_file, 'w') as option:
         json.dump(data, option)
 
@@ -111,7 +111,7 @@ def ue_remote(data):
         "objectPath": "/Script/PythonScriptPlugin.Default__PythonScriptLibrary",
         "functionName": "ExecutePythonCommandEx",
         "parameters": {
-            "pythonCommand": script_file
+            "pythonCommand": "%s \"%s\"" % (script_file, option_file)
         }
     }
     resp = requests.put(url, json.dumps(body), headers={'content-type': 'application/json'}, verify=False)

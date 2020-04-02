@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import unreal
 
@@ -193,7 +194,9 @@ def setup_sequencer(source, target, shot):
 
 
 def main():
-    with open(os.path.dirname(__file__) + '/option.json') as option:
+    option_file = sys.argv[1]
+    unreal.log_warning(option_file)
+    with open(option_file) as option:
         data = json.load(option)
         data['target'] = data['target'][:-1] if data['target'][-1] in ['\\', '/'] else data['target']
 
