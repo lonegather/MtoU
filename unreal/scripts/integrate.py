@@ -53,6 +53,7 @@ def get_option(data):
         option.skeletal_mesh_import_data.set_editor_property('import_uniform_scale', 1.0)
         option.skeletal_mesh_import_data.set_editor_property('import_morph_targets', True)
         option.skeletal_mesh_import_data.set_editor_property('update_skeleton_reference_pose', True)
+        option.skeletal_mesh_import_data.set_editor_property('use_t0_as_ref_pose ', True)
 
     elif stage in ['lyt', 'anm']:
         for asset_data in get_assets_by_class('Skeleton'):
