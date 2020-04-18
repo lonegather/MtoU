@@ -12,7 +12,7 @@ class DockerMain(Docker):
 
     CONTROL_NAME = 'mtou_docker_control'
     DOCK_LABEL_NAME = 'MtoU'
-    UI_PATH = '%s\\ui\\main.ui' % samkit.MODULE_PATH
+    UI_PATH = '%s/ui/main.ui' % samkit.MODULE_PATH
 
     def __init__(self, parent=None):
         super(DockerMain, self).__init__(parent=parent)
@@ -50,16 +50,16 @@ class DockerMain(Docker):
         self.ui.lv_asset.setResizeMode(QListView.Adjust)
         self.ui.lv_asset.setViewMode(QListView.IconMode)
         self.ui.lv_asset.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.ui.tb_add.setIcon(QIcon('%s\\icons\\add.png' % samkit.MODULE_PATH))
-        self.ui.tb_delete.setIcon(QIcon('%s\\icons\\delete.png' % samkit.MODULE_PATH))
-        self.ui.tb_refresh.setIcon(QIcon('%s\\icons\\refresh.png' % samkit.MODULE_PATH))
-        self.ui.tb_connect.setIcon(QIcon('%s\\icons\\setting.png' % samkit.MODULE_PATH))
-        self.ui.tb_batch.setIcon(QIcon('%s\\icons\\batch.png' % samkit.MODULE_PATH))
-        self.ui.tb_submit.setIcon(QIcon('%s\\icons\\checkin.png' % samkit.MODULE_PATH))
-        self.ui.tb_sync.setIcon(QIcon('%s\\icons\\sync.png' % samkit.MODULE_PATH))
-        self.ui.tb_merge.setIcon(QIcon('%s\\icons\\merge.png' % samkit.MODULE_PATH))
-        self.ui.tb_revert.setIcon(QIcon('%s\\icons\\revert.png' % samkit.MODULE_PATH))
-        self.ui.tb_camera.setIcon(QIcon('%s\\icons\\camera.png' % samkit.MODULE_PATH))
+        self.ui.tb_add.setIcon(QIcon('%s/icons/add.png' % samkit.MODULE_PATH))
+        self.ui.tb_delete.setIcon(QIcon('%s/icons/delete.png' % samkit.MODULE_PATH))
+        self.ui.tb_refresh.setIcon(QIcon('%s/icons/refresh.png' % samkit.MODULE_PATH))
+        self.ui.tb_connect.setIcon(QIcon('%s/icons/setting.png' % samkit.MODULE_PATH))
+        self.ui.tb_batch.setIcon(QIcon('%s/icons/batch.png' % samkit.MODULE_PATH))
+        self.ui.tb_submit.setIcon(QIcon('%s/icons/checkin.png' % samkit.MODULE_PATH))
+        self.ui.tb_sync.setIcon(QIcon('%s/icons/sync.png' % samkit.MODULE_PATH))
+        self.ui.tb_merge.setIcon(QIcon('%s/icons/merge.png' % samkit.MODULE_PATH))
+        self.ui.tb_revert.setIcon(QIcon('%s/icons/revert.png' % samkit.MODULE_PATH))
+        self.ui.tb_camera.setIcon(QIcon('%s/icons/camera.png' % samkit.MODULE_PATH))
 
         genus_model.dataChanged.connect(self.refresh_repository_genus)
         tag_model.dataChanged.connect(self.refresh_repository_tag)
@@ -238,7 +238,7 @@ class DockerMain(Docker):
             kwargs['id'] = self.detail_id
 
         if self.ui.cb_thumb.isChecked():
-            file_path = '%s\\%s.png' % (samkit.TMP_PATH, name)
+            file_path = '%s/%s.png' % (samkit.TMP_PATH, name)
             self.ui.lbl_thumb.pixmap().scaled(128, 128).save(file_path)
             kwargs['file'] = {'thumb': open(file_path, 'rb')}
 
@@ -376,7 +376,7 @@ class TaskReferenceAction(QAction):
 
 class TaskItem(QListWidgetItem):
 
-    UI_PATH = '%s\\ui\\task.ui' % samkit.MODULE_PATH
+    UI_PATH = '%s/ui/task.ui' % samkit.MODULE_PATH
     ID = Qt.UserRole + 1
     PATH = Qt.UserRole + 2
     TASK = Qt.UserRole + 3
@@ -433,8 +433,8 @@ class TaskItem(QListWidgetItem):
             if context == self._data['id']:
                 if self._data['stage'] not in ['lyt', 'anm']:
                     self._widget.ui.tb_camera.setEnabled(False)
-                self.widget.ui.lbl_icon.setPixmap(QPixmap('%s\\icons\\bookmark.png' % samkit.MODULE_PATH))
+                self.widget.ui.lbl_icon.setPixmap(QPixmap('%s/icons/bookmark.png' % samkit.MODULE_PATH))
             else:
-                self.widget.ui.lbl_icon.setPixmap(QPixmap('%s\\icons\\checked.png' % samkit.MODULE_PATH))
+                self.widget.ui.lbl_icon.setPixmap(QPixmap('%s/icons/checked.png' % samkit.MODULE_PATH))
         else:
-            self.widget.ui.lbl_icon.setPixmap(QPixmap('%s\\icons\\unavailable.png' % samkit.MODULE_PATH))
+            self.widget.ui.lbl_icon.setPixmap(QPixmap('%s/icons/unavailable.png' % samkit.MODULE_PATH))

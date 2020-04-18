@@ -122,7 +122,7 @@ class Docker(MayaQWidgetDockableMixin, QWidget):
 
 class AuthDialog(QDialog):
 
-    UI_PATH = '%s\\ui\\auth.ui' % samkit.MODULE_PATH
+    UI_PATH = '%s/ui/auth.ui' % samkit.MODULE_PATH
 
     def __init__(self, parent=None):
         super(AuthDialog, self).__init__(parent)
@@ -132,7 +132,7 @@ class AuthDialog(QDialog):
         self.host = ''
 
         self.setWindowTitle(self.ui.windowTitle())
-        self.ui.tb_browse.setIcon(QIcon('%s\\icons\\folder.png' % samkit.MODULE_PATH))
+        self.ui.tb_browse.setIcon(QIcon('%s/icons/folder.png' % samkit.MODULE_PATH))
 
         server = cmds.optionVar(q=samkit.OPT_HOST)
         server = server if server else ':'

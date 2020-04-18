@@ -26,7 +26,7 @@ __all__ = [
 ]
 
 TMP_PATH = os.getenv('TMP')
-MODULE_PATH = cmds.moduleInfo(path=True, moduleName='MtoU').replace('/', '\\')
+MODULE_PATH = cmds.moduleInfo(path=True, moduleName='MtoU')
 OPT_HOST = 'mtou_host'
 OPT_USERNAME = 'mtou_username'
 OPT_PROJECT = 'mtou_project'

@@ -289,7 +289,7 @@ class PluginItem(QStandardItem):
 
 class ResultItem(QStandardItem):
 
-    UI_PATH = '%s\\ui\\result.ui' % samkit.MODULE_PATH
+    UI_PATH = '%s/ui/result.ui' % samkit.MODULE_PATH
     WidgetRole = Qt.UserRole + 3
 
     def __init__(self, result):
@@ -298,13 +298,13 @@ class ResultItem(QStandardItem):
         self._result = result
         self.widget = QWidget()
         setup_ui(self.widget, self.UI_PATH)
-        self.widget.ui.tb_fix.setIcon(QIcon('%s\\icons\\fix.png' % samkit.MODULE_PATH))
+        self.widget.ui.tb_fix.setIcon(QIcon('%s/icons/fix.png' % samkit.MODULE_PATH))
         self.widget.ui.le_error.setText(str(result['error']))
 
         self.widget.ui.tb_fix.clicked.connect(self.fix)
         if not hasattr(result['plugin'], 'fix'):
             self.widget.ui.tb_fix.setEnabled(False)
-            self.widget.ui.tb_fix.setIcon(QIcon('%s\\icons\\fix_disabled.png' % samkit.MODULE_PATH))
+            self.widget.ui.tb_fix.setIcon(QIcon('%s/icons/fix_disabled.png' % samkit.MODULE_PATH))
 
     def setup(self):
         for lr in self._result['records']:

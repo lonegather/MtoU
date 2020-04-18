@@ -1,3 +1,3 @@
-+ PLATFORM:win64 MtoU 1.0 <PATH>
++ MtoU 1.0 <PATH>
 PYBLISHPLUGINPATH:= ./scripts/samkit/plugins
-QT_PREFERRED_BINDING=PySide2;PySide
+QT_VERBOSE=1
