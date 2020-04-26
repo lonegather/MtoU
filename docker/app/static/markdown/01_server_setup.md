@@ -40,7 +40,6 @@ python3 manage.py createsuperuser
 ```
 
 ### Django 数据库重置
-将 `app/setup_template.csv` 另存为 `app/setup.csv` 并在 SSH 客户端中执行以下命令：
 
 ```bash
 docker exec -it <name> /bin/bash

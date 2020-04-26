@@ -201,7 +201,8 @@ class PluginModel(QStandardItemModel):
             if plugin.order < 0.5 or plugin.order >= 1.5:
                 pyblish.api.register_plugin(plugin)
                 continue
-            if plugin.families == ['*'] or task['stage'] in plugin.families:
+            family = task['stage'] if task['tag'] != 'SC' else'ignore'
+            if plugin.families == ['*'] or family in plugin.families:
                 root.appendRow(PluginItem(plugin))
 
     def validate(self, index=None):

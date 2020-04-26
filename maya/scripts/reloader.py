@@ -14,9 +14,10 @@ reload_list = [
 
 def execute():
 
-    import samgui.widget
-    if samgui.widget.DockerMain.instance:
-        samgui.widget.DockerMain.instance.close()
+    import samgui
+    for name, widget in samgui.Docker._windows.items():
+        widget.close()
+    samgui.Docker._windows = []
 
     for mod in reload_list:
         try:

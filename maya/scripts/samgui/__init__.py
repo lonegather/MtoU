@@ -86,32 +86,32 @@ def setup_ui(container, ui):
 
 class Docker(MayaQWidgetDockableMixin, QWidget):
 
-    instance = None
+    _windows = {}
     CONTROL_NAME = 'docker_control'
     DOCK_LABEL_NAME = 'Docker'
 
     @classmethod
     def setup(cls, restore=False):
-        if cls.instance is None:
+        if cls._windows.get(cls, None) is None:
             docker = '%sWorkspaceControl' % cls.CONTROL_NAME
             if cmds.workspaceControl(docker, exists=True):
                 cmds.deleteUI(docker)
-            cls.instance = cls()
-            cls.instance.setObjectName(cls.CONTROL_NAME)
+            cls._windows[cls] = cls()
+            cls._windows[cls].setObjectName(cls.CONTROL_NAME)
 
         if restore:
             restored_control = MQtUtil.getCurrentParent()
             mixin_ptr = MQtUtil.findControl(cls.CONTROL_NAME)
             MQtUtil.addWidgetToMayaLayout(long(mixin_ptr), long(restored_control))
         else:
-            cls.instance.show(
+            cls._windows[cls].show(
                 area='right',
                 dockable=True,
                 label=cls.DOCK_LABEL_NAME,
                 uiScript='%s.setup(restore=True)' % cls
             )
 
-        return cls.instance
+        return cls._windows[cls]
 
     def __init__(self, parent=None):
         super(Docker, self).__init__(parent=parent)

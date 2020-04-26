@@ -102,7 +102,7 @@ def ue_remote(data):
             '../unreal/scripts/integrate.py'
         )
     )
-    option_file = os.path.expanduser('~\\mtou_import_option.json')
+    option_file = os.path.expanduser('~/mtou_import_option.json')
     with open(option_file, 'w') as option:
         json.dump(data, option)
 

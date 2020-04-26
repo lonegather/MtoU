@@ -172,7 +172,7 @@ def checkout(task):
     if not os.path.exists(basedir):
         try:
             os.makedirs(basedir)
-        except WindowsError:
+        except OSError:
             cmds.inViewMessage(
                 message='Can\'t create path: <font color="yellow">%s</font>.' % basedir,
                 position='midCenter',

@@ -47,7 +47,7 @@ class Project(models.Model):
     name = models.CharField(max_length=50)
     info = models.CharField(max_length=200, blank=True)
     fps = models.IntegerField(default=25)
-    camera = models.CharField(max_length=50, default='MainCAM')
+    camera = models.CharField(max_length=50, default='MainCam')
     root = models.CharField(max_length=200, default='file:///P:')
 
     @classmethod
@@ -72,12 +72,14 @@ class Project(models.Model):
             prj.info = form.get('info', [prj.info])[0]
             prj.fps = int(form.get('fps', [prj.fps])[0])
             prj.camera = form.get('camera', [prj.camera])[0]
+            prj.root = form.get('root', [prj.root])[0]
         else:
             prj = cls(
                 name=form.get('name', ['undefined'])[0],
                 info=form.get('info', [u'未命名'])[0],
                 fps=int(form.get('fps', [30])[0]),
                 camera=form.get('camera', ['MainCam'])[0],
+                root=form.get('root', ['file:///P:'])[0],
             )
         prj.save()
 
@@ -273,6 +275,7 @@ class Entity(models.Model):
                 'id': str(ent.id),
                 'name': ent.name,
                 'info': ent.info,
+                'project_id': str(ent.tag.project.id),
                 'genus_id': str(ent.tag.genus.id),
                 'genus_name': ent.tag.genus.name,
                 'genus_info': ent.tag.genus.info,

@@ -4,6 +4,7 @@ from Qt.QtCore import Signal, Qt
 
 import samkit
 from . import access, setup_ui, Docker
+from .batch import BatchIntegrationUI
 from .model import GenusModel, TagModel, AssetModel, PluginModel, PluginItem, ResultItem
 from .delegate import AssetDelegate, TaskDelegate, PluginDelegate
 
@@ -100,6 +101,7 @@ class DockerMain(Docker):
         plugin_model.resultGenerated.connect(self.set_result_widget)
         plugin_model.dataChanged.connect(self.refresh_check_state)
         self.ui.te_comment.textChanged.connect(self.refresh_check_state)
+        self.ui.tb_batch.clicked.connect(BatchIntegrationUI.setup)
 
         samkit.scriptJob(event=['SceneOpened', self.refresh_workspace])
         samkit.evalDeferred(self.refresh_repository)
@@ -241,6 +243,11 @@ class DockerMain(Docker):
             file_path = '%s/%s.png' % (samkit.TMP_PATH, name)
             self.ui.lbl_thumb.pixmap().scaled(128, 128).save(file_path)
             kwargs['file'] = {'thumb': open(file_path, 'rb')}
+
+        entities = samkit.get_data('entity', name=name, project_id=samkit.getenv(samkit.OPT_PROJECT_ID))
+        if entities and self.detail_id != entities[0]['id']:
+            samkit.get_confirm('Duplicated Name: %s' % name, icon='critical', choose=False)
+            return
 
         samkit.set_data('entity', **kwargs)
         self.refresh_repository()
@@ -401,10 +408,15 @@ class TaskItem(QListWidgetItem):
     def submit(self, *_):
         samkit.open_file(self._data)
         samkit.checkin([self._data])
-        self._widget.ui.tv_plugin.model().update(self._data)
+        model = self._widget.ui.tv_plugin.model()
+        model.update(self._data)
         self._widget.ui.splitter.setVisible(False)
         self._widget.ui.submit.setVisible(True)
         self._widget.ui.btn_submit.setEnabled(False)
+        if not model.rowCount():
+            self._widget.ui.btn_check.setEnabled(False)
+            self._widget.ui.btn_export.setEnabled(False)
+            self._widget.ui.tv_plugin.model().validate()
 
     def merge(self, *_):
         samkit.merge(self._data)

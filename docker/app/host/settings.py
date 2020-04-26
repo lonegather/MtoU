@@ -28,7 +28,7 @@ ARCHIVE_DIRECTORY = BASE_DIR
 SECRET_KEY = 'r=azyol8*&yn2o3(o(ot9a=-ovt47+hk5n(*y6vga8531s4&=a'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = sys.platform == 'win32'
+DEBUG = sys.platform in ['win32', 'darwin']
 
 ALLOWED_HOSTS = ['*']
 
