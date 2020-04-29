@@ -280,3 +280,13 @@ def create_camera():
     cmds.setAttr('MainCamShape.displayGateMaskColor', 0.0, 0.0, 0.0, type='double3')
     cmds.setAttr('MainCamShape.overscan', 1.0)
     cmds.lookThru('MainCamShape', 'perspView')
+
+
+def set_time_range():
+    ast = int(cmds.playbackOptions(q=1, ast=1))
+    aet = int(cmds.playbackOptions(q=1, aet=1))
+    mint = int(cmds.playbackOptions(q=1, min=1))
+    maxt = int(cmds.playbackOptions(q=1, max=1))
+    offset = 101 - ast
+    cmds.playbackOptions(min=mint+offset, max=maxt+offset, ast=ast+offset, aet=aet+offset)
+

@@ -127,6 +127,8 @@ class AssetModel(QAbstractListModel):
             if match:
                 self._data_filter.append(d)
 
+        self._data_filter.sort(key=lambda e: e['name'])
+
         self.filtered.emit()
         self.dataChanged.emit(QModelIndex(), QModelIndex())
 

@@ -114,7 +114,11 @@ def ue_remote(data):
             "pythonCommand": "%s \"%s\"" % (script_file, option_file)
         }
     }
-    resp = requests.put(url, json.dumps(body), headers={'content-type': 'application/json'}, verify=False)
-    result = json.loads(resp.text)
-    for output in result['LogOutput']:
-        print(output['Output'])
+    try:
+        resp = requests.put(url, json.dumps(body), headers={'content-type': 'application/json'}, verify=False)
+        result = json.loads(resp.text)
+        for output in result['LogOutput']:
+            print(output['Output'])
+        return True
+    except ConnectionError:
+        return False

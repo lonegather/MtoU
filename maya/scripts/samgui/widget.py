@@ -257,6 +257,7 @@ class DockerMain(Docker):
         pass
 
     def refresh_workspace(self, *_):
+        samkit.cmds.currentUnit(time='pal', updateAnimation=False)
         try:
             self.ui.tv_plugin.model().clear()
         except RuntimeError:
@@ -445,6 +446,8 @@ class TaskItem(QListWidgetItem):
             if context == self._data['id']:
                 if self._data['stage'] not in ['lyt', 'anm']:
                     self._widget.ui.tb_camera.setEnabled(False)
+                else:
+                    samkit.set_time_range()
                 self.widget.ui.lbl_icon.setPixmap(QPixmap('%s/icons/bookmark.png' % samkit.MODULE_PATH))
             else:
                 self.widget.ui.lbl_icon.setPixmap(QPixmap('%s/icons/checked.png' % samkit.MODULE_PATH))

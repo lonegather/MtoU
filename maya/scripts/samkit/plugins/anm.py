@@ -173,5 +173,5 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
 
         except ValueError:
             pass
-
+        print('cleanup')
         samkit.open_file(task, True)
