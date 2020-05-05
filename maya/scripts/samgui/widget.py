@@ -1,6 +1,6 @@
-from Qt.QtWidgets import QApplication, QWidget, QListView, QListWidgetItem, QMenu, QAction, QSplitter
+from Qt.QtWidgets import QApplication, QWidget, QListView, QListWidgetItem, QMenu, QAction
 from Qt.QtGui import QIcon, QPixmap
-from Qt.QtCore import Signal, Qt
+from Qt.QtCore import Signal, Qt, QEvent
 
 import samkit
 from . import access, setup_ui, Docker
@@ -51,6 +51,8 @@ class DockerMain(Docker):
         self.ui.lv_asset.setResizeMode(QListView.Adjust)
         self.ui.lv_asset.setViewMode(QListView.IconMode)
         self.ui.lv_asset.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.lv_asset.installEventFilter(self)
+        self.ui.lv_asset.viewport().installEventFilter(self)
         self.ui.tb_add.setIcon(QIcon('%s/icons/add.png' % samkit.MODULE_PATH))
         self.ui.tb_delete.setIcon(QIcon('%s/icons/delete.png' % samkit.MODULE_PATH))
         self.ui.tb_refresh.setIcon(QIcon('%s/icons/refresh.png' % samkit.MODULE_PATH))
@@ -105,6 +107,19 @@ class DockerMain(Docker):
 
         samkit.scriptJob(event=['SceneOpened', self.refresh_workspace])
         samkit.evalDeferred(self.refresh_repository)
+
+    def eventFilter(self, source, event):
+        if (
+            source is self.ui.lv_asset and
+            event.type() == QEvent.KeyPress and
+            event.modifiers() == Qt.NoModifier
+        ) or (
+            source is self.ui.lv_asset.viewport() and
+            event.type() == QEvent.MouseButtonPress and
+            not self.ui.lv_asset.indexAt(event.pos()).isValid()
+        ):
+            self.ui.lv_asset.selectionModel().clear()
+        return super(DockerMain, self).eventFilter(source, event)
 
     def refresh_repository(self, force=False):
         self.project_id = ''
@@ -414,10 +429,10 @@ class TaskItem(QListWidgetItem):
         self._widget.ui.splitter.setVisible(False)
         self._widget.ui.submit.setVisible(True)
         self._widget.ui.btn_submit.setEnabled(False)
+        self._widget.ui.btn_check.setEnabled(model.rowCount())
+        self._widget.ui.btn_export.setEnabled(model.rowCount())
         if not model.rowCount():
-            self._widget.ui.btn_check.setEnabled(False)
-            self._widget.ui.btn_export.setEnabled(False)
-            self._widget.ui.tv_plugin.model().validate()
+            model.validate()
 
     def merge(self, *_):
         samkit.merge(self._data)

@@ -82,19 +82,6 @@ def set_data(table, **filters):
     return update(host, table, **filters)
 
 
-def ue_command(data=None):
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        client.connect(('127.0.0.1', 8888))
-    except error:
-        return False
-    if data:
-        message = json.dumps(data)
-        client.send('{message}\n'.format(**locals()).encode())
-    client.close()
-    return True
-
-
 def ue_remote(data):
     script_file = os.path.abspath(
         os.path.join(

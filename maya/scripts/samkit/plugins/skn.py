@@ -158,11 +158,16 @@ class SkinExtractor(pyblish.api.InstancePlugin):
 
     def process(self, instance):
         import os
+        import shutil
         from maya import cmds, mel
         import samkit
 
         task = instance.data['task']
         samkit.open_file(task)
+
+        current_path = samkit.get_local_path(task)
+        current_dir = os.path.dirname(current_path)
+        shutil.copyfile(current_path, os.path.join(current_dir, 'scene_cache.ma'))
 
         name = instance.data['name']
         path = instance.data['pathDat'].replace('\\', '/')
@@ -223,7 +228,6 @@ class SkinExtractor(pyblish.api.InstancePlugin):
         mel.eval('FBXExportUseSceneName -v true;')
         mel.eval('FBXExport -f "%s" -s' % instance.data['message']['source'])
 
-        # samkit.ue_command(instance.data['message'])
         samkit.ue_remote(instance.data['message'])
 
         samkit.open_file(task, True)

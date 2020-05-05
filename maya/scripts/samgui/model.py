@@ -138,12 +138,14 @@ class AssetModel(QAbstractListModel):
     def data(self, index, role=Qt.DisplayRole):
         if len(self._data_filter) > index.row():
             return self._data_filter[index.row()].get(self._map.get(role, None), None)
-
+    '''
     def supportedDropActions(self):
         return Qt.CopyAction
 
     def flags(self, index):
         default_flags = super(AssetModel, self).flags(index)
+        if index.isValid():
+            return default_flags
         return Qt.ItemIsDropEnabled | default_flags
 
     def mimeTypes(self):
@@ -153,14 +155,13 @@ class AssetModel(QAbstractListModel):
         new_file = []
 
         for url in data.urls() or list():
-            print(url, row, column)
             file_path = url.toLocalFile()
             file_name = os.path.split(file_path)[1]
             if file_name.split('.')[-1] not in ["ma", "mb"]:
                 continue
 
         return True
-
+    '''
     def get_image(self, url):
         return self._hub.icon_set.get(url, self._hub.default_image)
 
@@ -191,19 +192,21 @@ class PluginModel(QStandardItemModel):
 
     def __init__(self, parent=None):
         super(PluginModel, self).__init__(parent)
+        self._task = None
 
         pyblish.api.deregister_all_callbacks()
         pyblish.api.register_callback('validated', self.on_validated)
 
     def update(self, task):
         self.clear()
+        self._task = task
         root = self.invisibleRootItem()
         pyblish.api.deregister_all_plugins()
         for plugin in pyblish.api.discover():
             if plugin.order < 0.5 or plugin.order >= 1.5:
                 pyblish.api.register_plugin(plugin)
                 continue
-            family = task['stage'] if task['tag'] != 'SC' else'ignore'
+            family = task['stage'] if task['tag'] != 'SC' else 'ignore'
             if plugin.families == ['*'] or family in plugin.families:
                 root.appendRow(PluginItem(plugin))
 
@@ -233,7 +236,7 @@ class PluginModel(QStandardItemModel):
         return pyblish.util.extract(context)
 
     def integrate(self, comment):
-        context = self.extract()
+        context = self.extract() if self._task['tag'] != 'SC' else self.validate()
         context.data['comment'] = comment
         return pyblish.util.integrate(context)
 

@@ -2,13 +2,14 @@ import os
 import time
 import json
 import shutil
-from maya import cmds
+from maya import cmds, utils
 
 import samcon
 from samcon.utils import *
 
 
 __all__ = [
+    'executeInMainThreadWithResult',
     'evalDeferred',
     'scriptJob',
     'auth_stats',
@@ -16,7 +17,7 @@ __all__ = [
     'logout',
     'get_data',
     'set_data',
-    'ue_command',
+    'ue_remote',
     'getenv',
     'hasenv',
     'local_path_exists',
@@ -45,6 +46,7 @@ __all__ = [
     'OPT_COOKIES',
 ]
 
+executeInMainThreadWithResult = utils.executeInMainThreadWithResult
 evalDeferred = cmds.evalDeferred
 scriptJob = cmds.scriptJob
 auth_stats = samcon.auth_stats
@@ -52,7 +54,6 @@ login = samcon.login
 logout = samcon.logout
 get_data = samcon.get_data
 set_data = samcon.set_data
-ue_command = samcon.ue_command
 ue_remote = samcon.ue_remote
 
 

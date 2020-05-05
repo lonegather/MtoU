@@ -46,11 +46,16 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
 
     def process(self, instance):
         import os
+        import shutil
         from maya import cmds, mel
         import samkit
 
         task = instance.data['task']
         samkit.open_file(task)
+
+        current_path = samkit.get_local_path(task)
+        current_dir = os.path.dirname(current_path)
+        shutil.copyfile(current_path, os.path.join(current_dir, 'scene_cache.ma'))
 
         name = instance.data['name']
         path = instance.data['pathDat'].replace('\\', '/')
@@ -118,25 +123,18 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
                         'end': float(maxt),
                     }
                 }
-
+                namespace = ':'+':'.join(joint.split(':')[:-1])
+                contents = cmds.namespaceInfo(namespace, listNamespace=True)
+                try: cmds.parent(joint, world=True)
+                except RuntimeError: pass
+                cmds.select(contents, r=True)
+                if namespace != ':':
+                    cmds.namespace(removeNamespace=namespace, mergeNamespaceWithRoot=True)
+                mel.eval('FBXExport -f "%s" -s' % instance.data['message']['source'])
+                samkit.ue_remote(instance.data['message'])
+                cmds.delete()
             except ValueError:
                 continue
-
-            namespace = ':'+':'.join(joint.split(':')[:-1])
-
-            cmds.select(joint, r=True)
-            try:
-                cmds.parent(joint, world=True)
-            except: pass
-
-            if namespace != ':':
-                cmds.namespace(removeNamespace=namespace, mergeNamespaceWithRoot=True)
-
-            mel.eval('FBXExport -f "%s" -s' % instance.data['message']['source'])
-
-            # samkit.ue_command(instance.data['message'])
-            samkit.ue_remote(instance.data['message'])
-            cmds.delete()
 
         try:
             instance.data['message'] = {
@@ -156,7 +154,7 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
 
             cmds.duplicate('MainCam', name='ShotCam')
             try: cmds.parent('ShotCam', world=True)
-            except: pass
+            except RuntimeError: pass
             cmds.xform('ShotCam', ra=[0.0, -90.0, 0.0], roo='xzy', p=True)
             cmds.parentConstraint('MainCam', 'ShotCam', mo=True)
             cmds.connectAttr('MainCamShape.focalLength', 'ShotCamShape.focalLength', f=True)
@@ -168,10 +166,9 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
             mel.eval('FBXExportApplyConstantKeyReducer -v false;')
             mel.eval('FBXExport -f "%s" -s' % instance.data['message']['source'])
 
-            # samkit.ue_command(instance.data['message'])
             samkit.ue_remote(instance.data['message'])
 
         except ValueError:
             pass
-        print('cleanup')
+
         samkit.open_file(task, True)

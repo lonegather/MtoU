@@ -91,11 +91,14 @@ class Docker(MayaQWidgetDockableMixin, QWidget):
     DOCK_LABEL_NAME = 'Docker'
 
     @classmethod
-    def setup(cls, restore=False):
-        if cls._windows.get(cls, None) is None:
+    def setup(cls, dockable=True, floating=True, area='left', restore=False):
+        if cls._windows.get(cls, None) is None and dockable:
             docker = '%sWorkspaceControl' % cls.CONTROL_NAME
             if cmds.workspaceControl(docker, exists=True):
                 cmds.deleteUI(docker)
+            cls._windows[cls] = cls()
+            cls._windows[cls].setObjectName(cls.CONTROL_NAME)
+        elif not dockable:
             cls._windows[cls] = cls()
             cls._windows[cls].setObjectName(cls.CONTROL_NAME)
 
@@ -105,8 +108,9 @@ class Docker(MayaQWidgetDockableMixin, QWidget):
             MQtUtil.addWidgetToMayaLayout(long(mixin_ptr), long(restored_control))
         else:
             cls._windows[cls].show(
-                area='right',
-                dockable=True,
+                area=area,
+                dockable=dockable,
+                floating=floating,
                 label=cls.DOCK_LABEL_NAME,
                 uiScript='%s.setup(restore=True)' % cls
             )

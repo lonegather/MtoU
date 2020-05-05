@@ -1,4 +1,4 @@
-from maya import cmds, mel
+from maya import cmds, mel, standalone
 
 
 def setup(*_):
@@ -24,4 +24,7 @@ def setup(*_):
     cmds.evalDeferred(lambda: cmds.inViewMessage(message='MtoU Ready', position='midCenter', fade=True))
 
 
-cmds.evalDeferred(setup)
+try:
+    standalone.initialize()
+except RuntimeError:
+    cmds.evalDeferred(setup)

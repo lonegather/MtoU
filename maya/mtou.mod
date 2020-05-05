@@ -1,3 +1,4 @@
 + MtoU 1.0 <PATH>
 PYBLISHPLUGINPATH:= ./scripts/samkit/plugins
+MAYA_UI_LANGUAGE=en_US
 QT_VERBOSE=1

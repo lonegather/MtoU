@@ -47,7 +47,7 @@ class EntityIntegrator(pyblish.api.InstancePlugin):
         task = instance.data['task']
         samkit.open_file(task)
 
-        current_path = samkit.get_local_path(task)
+        current_dir = os.path.dirname(samkit.get_local_path(task))
         source_path = instance.data['pathSrc']
         source_base = os.path.basename(source_path)
         source_dir = os.path.dirname(source_path)
@@ -78,7 +78,7 @@ class EntityIntegrator(pyblish.api.InstancePlugin):
         with open(history_path, 'w') as fp:
             json.dump(history, fp, indent=2)
 
-        shutil.copyfile(current_path, source_path)
+        shutil.copyfile(os.path.join(current_dir, 'scene_cache.ma'), source_path)
 
         samkit.set_data('task', id=task['id'], owner='')
         samkit.new_file()
