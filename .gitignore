@@ -7,6 +7,7 @@ docker/app/media/thumbs/*.png
 !docker/app/media/thumbs/default.png
 docker/app/static/admin/
 docker/app/backups/
+Thumbs.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

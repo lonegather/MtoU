@@ -64,11 +64,11 @@ class FileListModel(QAbstractListModel):
                 if episode not in [tag['name'] for tag in tags] or not len(projects):
                     text_color = QColor(80, 80, 80)
                     skip = True
-
+                tag_id = [tag['id'] for tag in tags if tag['name'] == episode]
                 self._files.append({
                     'source': file_path,
                     'name': file_name,
-                    'episode': episode,
+                    'tag_id': tag_id[0] if tag_id else '',
                     'display': file_name,
                     'color': text_color,
                     'skip': skip,
@@ -96,12 +96,13 @@ class FileListModel(QAbstractListModel):
                 self.dataChanged.emit(QModelIndex(), QModelIndex())
                 return
             current_file = self._files[current]
+        current_file['color'] = QColor(Qt.yellow)
+        current_file['display'] = current_file['name'] + ' - ' + 'processing...'
         self.running = True
-
+        self.dataChanged.emit(QModelIndex(), QModelIndex())
         self._thread = CommandThread(current_file, current+1)
         self._thread.completed.connect(self.start)
         self._thread.start()
-        self.dataChanged.emit(QModelIndex(), QModelIndex())
 
     def clear(self):
         if not self.running:
@@ -161,11 +162,51 @@ class CommandThread(QThread):
         self._file = current_file
         self._next = next_index
 
-    def execute(self):
-        from pprint import pprint
-        pprint(self._file)
+    def merge(self, task):
+        print('Merging: %s - %s...' % (task['tag'], task['entity']))
+        return QColor(Qt.green), '', True
+
+    def export(self, task):
+        print('Exporting: %s - %s...' % (task['tag'], task['entity']))
+        return QColor(Qt.green), '', True
+
+    def submit(self, task):
+        print('Submitting: %s - %s...' % (task['tag'], task['entity']))
         return QColor(Qt.green), 'Done'
 
     def run(self):
-        color, message = samkit.executeInMainThreadWithResult(self.execute)
+        self.sleep(1)
+
+        # Sync Database
+        kwargs = {
+            'name': self._file['name'].split('_')[-1],
+            'tag_id': self._file['tag_id'],
+        }
+        shots = samkit.get_data('entity', **kwargs)
+        if len(shots):
+            kwargs['id'] = shots[0]['id']
+            task = samkit.get_data(
+                'task',
+                stage='anm',
+                entity_id=kwargs['id'],
+            )[0]
+        else:
+            samkit.set_data('entity', **kwargs)
+            task = samkit.get_data(
+                'task',
+                stage='anm',
+                entity=kwargs['name'],
+            )[0]
+
+        color, message, success = samkit.executeInMainThreadWithResult(self.merge, task)
+        if not success:
+            self.completed.emit(color, message, self._next)
+            return
+
+        color, message, success = samkit.executeInMainThreadWithResult(self.export, task)
+        if not success:
+            self.completed.emit(color, message, self._next)
+            return
+
+        color, message = samkit.executeInMainThreadWithResult(self.submit, task)
         self.completed.emit(color, message, self._next)
