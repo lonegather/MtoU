@@ -72,7 +72,10 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
 
         for ref in cmds.ls(type='reference'):
             if ref != 'sharedReferenceNode':
-                cmds.file(importReference=True, referenceNode=ref)
+                try:
+                    cmds.file(importReference=True, referenceNode=ref)
+                except RuntimeError:
+                    continue
 
         mel.eval('FBXExportAnimationOnly -v false;')
         mel.eval('FBXExportApplyConstantKeyReducer -v false;')
@@ -125,13 +128,15 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
                 }
                 namespace = ':'+':'.join(joint.split(':')[:-1])
                 contents = cmds.namespaceInfo(namespace, listNamespace=True)
+                contents = [obj.split(':')[-1] for obj in contents]
                 try: cmds.parent(joint, world=True)
                 except RuntimeError: pass
-                cmds.select(contents, r=True)
+                cmds.select(joint, r=True)
                 if namespace != ':':
                     cmds.namespace(removeNamespace=namespace, mergeNamespaceWithRoot=True)
                 mel.eval('FBXExport -f "%s" -s' % instance.data['message']['source'])
                 samkit.ue_remote(instance.data['message'])
+                cmds.select(contents, r=True)
                 cmds.delete()
             except ValueError:
                 continue
