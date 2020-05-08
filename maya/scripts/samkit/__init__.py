@@ -164,7 +164,7 @@ def sync(task, version):
     open_file(task, True)
 
 
-def checkout(task):
+def checkout(task, use_scene=False):
     source_path = get_source_path(task)
     local_path = get_local_path(task)
     current_path = cmds.file(q=True, sn=True)
@@ -184,22 +184,23 @@ def checkout(task):
     samcon.set_data('task', id=task['id'], owner=getenv(OPT_USERNAME))
     task['owner'] = getenv(OPT_USERNAME)
 
-    if current_path:
-        cmds.file(save=True)
-    if not os.path.exists(source_path):
-        cmds.file(new=True, force=True)
-        cmds.fileInfo('mtou_context', json.dumps(task))
-        cmds.file(rename=source_path)
-    else:
-        cmds.file(source_path, open=True, force=True)
-        cmds.fileInfo('mtou_context', json.dumps(task))
+    if not use_scene:
+        if current_path:
+            cmds.file(save=True)
+        if not os.path.exists(source_path):
+            cmds.file(new=True, force=True)
+            cmds.fileInfo('mtou_context', json.dumps(task))
+            cmds.file(rename=source_path)
+        else:
+            cmds.file(source_path, open=True, force=True)
+            cmds.fileInfo('mtou_context', json.dumps(task))
 
-    cmds.file(save=True, type='mayaAscii')
+        cmds.file(save=True, type='mayaAscii')
 
-    if current_path:
-        cmds.file(current_path, open=True, force=True)
-    else:
-        cmds.file(new=True, force=True)
+        if current_path:
+            cmds.file(current_path, open=True, force=True)
+        else:
+            cmds.file(new=True, force=True)
 
     source_base = os.path.basename(source_path)
     source_dir = os.path.dirname(source_path)
@@ -225,7 +226,7 @@ def checkout(task):
     if not os.path.exists(basedir):
         os.makedirs(basedir)
 
-    shutil.copyfile(source_path, local_path)
+    shutil.copyfile(current_path if use_scene else source_path, local_path)
     return True
 
 

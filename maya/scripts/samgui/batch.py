@@ -1,6 +1,6 @@
 import os
-import json
-import subprocess
+import pyblish.api
+import pyblish.util
 from Qt.QtCore import Qt, QAbstractListModel, QModelIndex, QSize, QThread, Signal, QEvent
 from Qt.QtGui import QColor
 import samkit
@@ -161,17 +161,26 @@ class CommandThread(QThread):
         super(CommandThread, self).__init__()
         self._file = current_file
         self._next = next_index
+        self._plugins = []
+        self._context = None
 
-    def merge(self, task):
-        print('Merging: %s - %s...' % (task['tag'], task['entity']))
+    def validate(self, task):
+        print('Validating: %s - %s...' % (task['tag'], task['entity']))
+        self._context = pyblish.util.validate(pyblish.util.collect(), self._plugins)
+        for result in self._context.data['results']:
+            if not result['success']:
+                return QColor(Qt.red), 'Validation failed.', False
         return QColor(Qt.green), '', True
 
-    def export(self, task):
-        print('Exporting: %s - %s...' % (task['tag'], task['entity']))
+    def extract(self, task):
+        print('Extracting: %s - %s...' % (task['tag'], task['entity']))
+        self._context = pyblish.util.extract(self._context)
         return QColor(Qt.green), '', True
 
-    def submit(self, task):
-        print('Submitting: %s - %s...' % (task['tag'], task['entity']))
+    def integrate(self, task):
+        print('Integrating: %s - %s...' % (task['tag'], task['entity']))
+        self._context.data['comment'] = 'Auto Message: Batch Integration'
+        pyblish.util.integrate(self._context)
         return QColor(Qt.green), 'Done'
 
     def run(self):
@@ -198,15 +207,41 @@ class CommandThread(QThread):
                 entity=kwargs['name'],
             )[0]
 
-        color, message, success = samkit.executeInMainThreadWithResult(self.merge, task)
+        if task['owner']:
+            if task['owner'] != samkit.getenv(samkit.OPT_USERNAME):
+                self.completed.emit(
+                    QColor(Qt.red),
+                    '%s already checked out by %s.' % (task['entity'], task['owner']),
+                    self._next,
+                )
+                return
+        elif not samkit.executeInMainThreadWithResult(samkit.checkout, task, True):
+            self.completed.emit(
+                QColor(Qt.red),
+                'Source path unreachable.',
+                self._next,
+            )
+            return
+
+        samkit.executeInMainThreadWithResult(samkit.open_file, task)
+        pyblish.api.deregister_all_plugins()
+        for plugin in pyblish.api.discover():
+            if plugin.order < 0.5 or plugin.order >= 1.5:
+                pyblish.api.register_plugin(plugin)
+                continue
+            family = task['stage'] if task['tag'] != 'SC' else 'ignore'
+            if plugin.families == ['*'] or family in plugin.families:
+                self._plugins.append(plugin)
+
+        color, message, success = samkit.executeInMainThreadWithResult(self.validate, task)
         if not success:
             self.completed.emit(color, message, self._next)
             return
 
-        color, message, success = samkit.executeInMainThreadWithResult(self.export, task)
+        color, message, success = samkit.executeInMainThreadWithResult(self.extract, task)
         if not success:
             self.completed.emit(color, message, self._next)
             return
 
-        color, message = samkit.executeInMainThreadWithResult(self.submit, task)
+        color, message = samkit.executeInMainThreadWithResult(self.integrate, task)
         self.completed.emit(color, message, self._next)
