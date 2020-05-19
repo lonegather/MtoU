@@ -51,20 +51,29 @@ class FileListModel(QAbstractListModel):
             else:
                 file_name = os.path.splitext(file_name)[0]
                 try:
-                    project, episode, scene = file_name.split('_')
-                    text_color = QColor(Qt.white)
-                    skip = False
+                    project = samkit.get_data('project', id=samkit.getenv(samkit.OPT_PROJECT_ID))
+                    project = project[0]['name']
+                    if file_name.find(project) == 0:
+                        episode, scene, suffix = file_name[(len(project)+1):].split('_', 2)
+                        if suffix != 'anm':
+                            raise IndexError
+                        text_color = QColor(Qt.white)
+                        skip = False
+                        tags = samkit.get_data('tag', genus='shot', project_id=samkit.getenv(samkit.OPT_PROJECT_ID))
+                        if episode not in [tag['name'] for tag in tags]:
+                            raise IndexError
+                        tag_id = [tag['id'] for tag in tags if tag['name'] == episode]
+                    else:
+                        raise IndexError
+                except IndexError:
+                    tag_id = ''
+                    text_color = QColor(80, 80, 80)
+                    skip = True
                 except ValueError:
-                    project, episode, scene = '', '', ''
+                    tag_id = ''
                     text_color = QColor(80, 80, 80)
                     skip = True
 
-                tags = samkit.get_data('tag', genus='shot', project_id=samkit.getenv(samkit.OPT_PROJECT_ID))
-                projects = samkit.get_data('project', name=project, id=samkit.getenv(samkit.OPT_PROJECT_ID))
-                if episode not in [tag['name'] for tag in tags] or not len(projects):
-                    text_color = QColor(80, 80, 80)
-                    skip = True
-                tag_id = [tag['id'] for tag in tags if tag['name'] == episode]
                 self._files.append({
                     'source': file_path,
                     'name': file_name,
@@ -96,6 +105,7 @@ class FileListModel(QAbstractListModel):
                 self.dataChanged.emit(QModelIndex(), QModelIndex())
                 return
             current_file = self._files[current]
+        print(current, current_file)
         current_file['color'] = QColor(Qt.yellow)
         current_file['display'] = current_file['name'] + ' - ' + 'processing...'
         self.running = True
@@ -169,6 +179,7 @@ class CommandThread(QThread):
         self._context = pyblish.util.validate(pyblish.util.collect(), self._plugins)
         for result in self._context.data['results']:
             if not result['success']:
+                print(result)
                 return QColor(Qt.red), 'Validation failed.', False
         return QColor(Qt.green), '', True
 
@@ -185,63 +196,74 @@ class CommandThread(QThread):
 
     def run(self):
         self.sleep(1)
+        try:
+            # Sync Database
+            kwargs = {
+                'name': self._file['name'].split('_')[-2],
+                'tag_id': self._file['tag_id'],
+            }
+            shots = samkit.get_data('entity', **kwargs)
+            if len(shots):
+                kwargs['id'] = shots[0]['id']
+                task = samkit.get_data(
+                    'task',
+                    stage='anm',
+                    entity_id=kwargs['id'],
+                )[0]
+            else:
+                name = self._file['name'].split('_')[-2]
+                samkit.set_data('entity', name=name, info=name, tag_id=self._file['tag_id'])
+                entity = samkit.get_data(
+                    'entity',
+                    project_id=samkit.executeInMainThreadWithResult(samkit.getenv, samkit.OPT_PROJECT_ID),
+                    tag_id=self._file['tag_id'],
+                    name=name,
+                )[0]
+                task = samkit.get_data(
+                    'task',
+                    stage='anm',
+                    entity_id=entity['id'],
+                )[0]
 
-        # Sync Database
-        kwargs = {
-            'name': self._file['name'].split('_')[-1],
-            'tag_id': self._file['tag_id'],
-        }
-        shots = samkit.get_data('entity', **kwargs)
-        if len(shots):
-            kwargs['id'] = shots[0]['id']
-            task = samkit.get_data(
-                'task',
-                stage='anm',
-                entity_id=kwargs['id'],
-            )[0]
-        else:
-            samkit.set_data('entity', **kwargs)
-            task = samkit.get_data(
-                'task',
-                stage='anm',
-                entity=kwargs['name'],
-            )[0]
-
-        if task['owner']:
-            if task['owner'] != samkit.getenv(samkit.OPT_USERNAME):
+            if task['owner']:
+                if task['owner'] != samkit.getenv(samkit.OPT_USERNAME):
+                    self.completed.emit(
+                        QColor(Qt.red),
+                        '%s already checked out by %s.' % (task['entity'], task['owner']),
+                        self._next,
+                    )
+                    return
+            elif not samkit.executeInMainThreadWithResult(samkit.checkout, task, self._file['source']):
                 self.completed.emit(
                     QColor(Qt.red),
-                    '%s already checked out by %s.' % (task['entity'], task['owner']),
+                    'Source path unreachable.',
                     self._next,
                 )
                 return
-        elif not samkit.executeInMainThreadWithResult(samkit.checkout, task, True):
-            self.completed.emit(
-                QColor(Qt.red),
-                'Source path unreachable.',
-                self._next,
-            )
-            return
 
-        samkit.executeInMainThreadWithResult(samkit.open_file, task)
-        pyblish.api.deregister_all_plugins()
-        for plugin in pyblish.api.discover():
-            if plugin.order < 0.5 or plugin.order >= 1.5:
-                pyblish.api.register_plugin(plugin)
-                continue
-            family = task['stage'] if task['tag'] != 'SC' else 'ignore'
-            if plugin.families == ['*'] or family in plugin.families:
-                self._plugins.append(plugin)
+            samkit.executeInMainThreadWithResult(samkit.open_file, task, True)
+            samkit.executeInMainThreadWithResult(samkit.checkin, [task])
+            pyblish.api.deregister_all_plugins()
+            for plugin in pyblish.api.discover():
+                if plugin.order < 0.5 or plugin.order >= 1.5:
+                    pyblish.api.register_plugin(plugin)
+                    continue
+                family = task['stage'] if task['tag'] != 'SC' else 'ignore'
+                if plugin.families == ['*'] or family in plugin.families:
+                    self._plugins.append(plugin)
 
-        color, message, success = samkit.executeInMainThreadWithResult(self.validate, task)
-        if not success:
+            color, message, success = samkit.executeInMainThreadWithResult(self.validate, task)
+            if not success:
+                self.completed.emit(color, message, self._next)
+                return
+
+            color, message, success = samkit.executeInMainThreadWithResult(self.extract, task)
+            if not success:
+                self.completed.emit(color, message, self._next)
+                return
+
+            color, message = samkit.executeInMainThreadWithResult(self.integrate, task)
             self.completed.emit(color, message, self._next)
-            return
 
-        color, message, success = samkit.executeInMainThreadWithResult(self.extract, task)
-        if not success:
-            self.completed.emit(color, message, self._next)
-            return
-
-        color, message = samkit.executeInMainThreadWithResult(self.integrate, task)
-        self.completed.emit(color, message, self._next)
+        finally:
+            pass

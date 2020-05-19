@@ -27,7 +27,7 @@ def spawn_actor_from_class(class_to_use):
 def get_option(data):
     stage = data['stage']
     option = unreal.FbxImportUI()
-    option.set_editor_property('create_physics_asset', False)
+    option.set_editor_property('create_physics_asset', True)
     option.set_editor_property('import_animations', bool(stage in ['lyt', 'anm']))
     option.set_editor_property('import_as_skeletal', bool(stage in ['skn', 'rig']))
     option.set_editor_property('import_materials', bool(stage in ['mdl']))

@@ -164,7 +164,7 @@ def sync(task, version):
     open_file(task, True)
 
 
-def checkout(task, use_scene=False):
+def checkout(task, use_scene=''):
     source_path = get_source_path(task)
     local_path = get_local_path(task)
     current_path = cmds.file(q=True, sn=True)
@@ -202,6 +202,18 @@ def checkout(task, use_scene=False):
         else:
             cmds.file(new=True, force=True)
 
+    else:
+        if current_path:
+            cmds.file(save=True)
+        cmds.file(use_scene, open=True, force=True)
+        cmds.fileInfo('mtou_context', json.dumps(task))
+        cmds.file(save=True, type='mayaAscii')
+
+        if current_path:
+            cmds.file(current_path, open=True, force=True)
+        else:
+            cmds.file(new=True, force=True)
+
     source_base = os.path.basename(source_path)
     source_dir = os.path.dirname(source_path)
     history_dir = os.path.join(source_dir, '.history')
@@ -226,7 +238,7 @@ def checkout(task, use_scene=False):
     if not os.path.exists(basedir):
         os.makedirs(basedir)
 
-    shutil.copyfile(current_path if use_scene else source_path, local_path)
+    shutil.copyfile(use_scene if use_scene else source_path, local_path)
     return True
 
 
