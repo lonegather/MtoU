@@ -158,6 +158,13 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
             }
 
             cmds.duplicate('MainCam', name='ShotCam')
+            cmds.setAttr('ShotCam.tx', lock=False)
+            cmds.setAttr('ShotCam.ty', lock=False)
+            cmds.setAttr('ShotCam.tz', lock=False)
+            cmds.setAttr('ShotCam.rx', lock=False)
+            cmds.setAttr('ShotCam.ry', lock=False)
+            cmds.setAttr('ShotCam.rz', lock=False)
+            cmds.setAttr('ShotCam.fl', lock=False)
             try: cmds.parent('ShotCam', world=True)
             except RuntimeError: pass
             cmds.xform('ShotCam', ra=[0.0, -90.0, 0.0], roo='xzy', p=True)
