@@ -176,9 +176,10 @@ def setup_sequencer(source, target, shot):
     filmback_settings.set_editor_property('sensor_height', shot['aperture_height'])
     focus_settings = cine_camera_component.get_editor_property('focus_settings')
     try:
-        focus_settings.set_editor_property('focus_method', unreal.CameraFocusMethod.DISABLE)
-    except AttributeError as error:
-        focus_settings.set_editor_property('focus_method', unreal.CameraFocusMethod.NONE)
+        focus_method = unreal.CameraFocusMethod.MANUAL if shot['focus'] else unreal.CameraFocusMethod.DISABLE
+    except AttributeError:
+        focus_method = unreal.CameraFocusMethod.MANUAL if shot['focus'] else unreal.CameraFocusMethod.NONE
+    focus_settings.set_editor_property('focus_method', focus_method)
     binding = level_sequence.add_possessable(cine_camera)
     level_sequence.add_possessable(cine_camera_component)
 

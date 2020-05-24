@@ -152,6 +152,7 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
                     'end': float(maxt),
                     'chars': chars,
                     'anims': anims,
+                    'focus': cmds.getAttr('MainCamShape.depthOfField'),
                     'aperture_width': cmds.getAttr('MainCamShape.horizontalFilmAperture'),
                     'aperture_height': cmds.getAttr('MainCamShape.verticalFilmAperture'),
                 }
@@ -165,14 +166,33 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
             cmds.setAttr('ShotCam.ry', lock=False)
             cmds.setAttr('ShotCam.rz', lock=False)
             cmds.setAttr('ShotCam.fl', lock=False)
+            cmds.setAttr('ShotCam.fd', lock=False)
+            cmds.setAttr('ShotCamShape.depthOfField', 1)
             try: cmds.parent('ShotCam', world=True)
             except RuntimeError: pass
             cmds.xform('ShotCam', ra=[0.0, -90.0, 0.0], roo='xzy', p=True)
             cmds.parentConstraint('MainCam', 'ShotCam', mo=True)
+            cmds.connectAttr('MainCamShape.depthOfField', 'ShotCamShape.depthOfField', f=True)
             cmds.connectAttr('MainCamShape.focalLength', 'ShotCamShape.focalLength', f=True)
+            cmds.connectAttr('MainCamShape.focusDistance', 'ShotCamShape.focusDistance', f=True)
 
             cmds.select('ShotCam', r=True)
-            cmds.setKeyframe('ShotCamShape.fl', t=['0sec'])
+            cmds.bakeResults(
+                'ShotCam*',
+                simulation=True,
+                time=(int(mint), int(maxt)),
+                sampleBy=1,
+                oversamplingRate=1,
+                disableImplicitControl=True,
+                preserveOutsideKeys=True,
+                sparseAnimCurveBake=False,
+                removeBakedAttributeFromLayer=False,
+                removeBakedAnimFromLayer=False,
+                bakeOnOverrideLayer=False,
+                minimizeRotation=False,
+                controlPoints=False,
+                shape=True,
+            )
             mel.eval('FBXExportCameras -v true;')
             mel.eval('FBXExportUpAxis y;')
             mel.eval('FBXExportApplyConstantKeyReducer -v false;')

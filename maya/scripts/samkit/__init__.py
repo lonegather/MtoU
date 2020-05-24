@@ -287,6 +287,7 @@ def create_camera():
 
     cmds.setAttr('MainCamShape.horizontalFilmAperture', 1.6798)
     cmds.setAttr('MainCamShape.farClipPlane', 999999)
+    cmds.setAttr('MainCamShape.depthOfField', 1)
     cmds.setAttr('MainCamShape.displayFilmGate', 1)
     cmds.setAttr('MainCamShape.displayGateMask', 1)
     cmds.setAttr('MainCamShape.displayResolution', 0)
