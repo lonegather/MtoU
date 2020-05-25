@@ -106,15 +106,16 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
         chars = []
         anims = []
         family = instance.data['family']
+        solo_export = cmds.optionVar(q='mtou_solo_export')
         for joint in cmds.ls(type='joint'):
             try:
                 char = joint.split(':')[0]
                 skel = cmds.getAttr('%s.UE_Skeleton' % joint)
+                if not skel.count(solo_export):
+                    continue
                 anim = '{project}_{tag}_{name}_{family}_{char}'.format(**locals())
                 chars.append(skel)
                 anims.append(anim)
-                print('joint ------------ ' + joint)
-                print('skel ------------ ' + skel)
                 instance.data['message'] = {
                     'stage': task['stage'],
                     'source': '%s/%s.fbx' % (path, anim),
@@ -142,6 +143,7 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
                 continue
 
         try:
+            assert not solo_export
             instance.data['message'] = {
                 'stage': 'cam',
                 'source': '{path}/{project}_{tag}_{name}_{family}_MainCam_S{mins}_E{maxs}.fbx'.format(**locals()),
@@ -165,8 +167,8 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
             cmds.setAttr('ShotCam.rx', lock=False)
             cmds.setAttr('ShotCam.ry', lock=False)
             cmds.setAttr('ShotCam.rz', lock=False)
-            cmds.setAttr('ShotCam.fl', lock=False)
-            cmds.setAttr('ShotCam.fd', lock=False)
+            cmds.setAttr('ShotCamShape.fl', lock=False)
+            cmds.setAttr('ShotCamShape.fd', lock=False)
             cmds.setAttr('ShotCamShape.depthOfField', 1)
             try: cmds.parent('ShotCam', world=True)
             except RuntimeError: pass
@@ -197,10 +199,9 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
             mel.eval('FBXExportUpAxis y;')
             mel.eval('FBXExportApplyConstantKeyReducer -v false;')
             mel.eval('FBXExport -f "%s" -s' % instance.data['message']['source'])
-
             samkit.ue_remote(instance.data['message'])
 
-        except ValueError:
+        except (ValueError, AssertionError):
             pass
-
-        samkit.open_file(task, True)
+        finally:
+            samkit.open_file(task, True)

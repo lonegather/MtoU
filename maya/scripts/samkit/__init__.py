@@ -242,9 +242,10 @@ def checkout(task, use_scene=''):
     return True
 
 
-def checkin(submit_list):
+def checkin(submit_list, solo_export=''):
     submit_str = json.dumps(submit_list)
     cmds.optionVar(sv=('mtou_submit', submit_str))
+    cmds.optionVar(sv=('mtou_solo_export', solo_export))
 
 
 def reference(task):

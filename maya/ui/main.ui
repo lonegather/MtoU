@@ -393,6 +393,16 @@
           </spacer>
          </item>
          <item>
+          <widget class="QToolButton" name="tb_solo">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="autoRaise">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QToolButton" name="tb_camera">
            <property name="text">
             <string/>
