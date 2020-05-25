@@ -106,44 +106,36 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
         chars = []
         anims = []
         family = instance.data['family']
-        solo_export = cmds.optionVar(q='mtou_solo_export')
-        for joint in cmds.ls(type='joint'):
-            try:
-                char = joint.split(':')[0]
-                skel = cmds.getAttr('%s.UE_Skeleton' % joint)
-                if not skel.count(solo_export):
-                    continue
-                anim = '{project}_{tag}_{name}_{family}_{char}'.format(**locals())
-                chars.append(skel)
-                anims.append(anim)
-                instance.data['message'] = {
-                    'stage': task['stage'],
-                    'source': '%s/%s.fbx' % (path, anim),
-                    'target': '/Game/%s' % task['path'].split(';')[1],
-                    'skeleton': skel,
-                    'shot': {
-                        'fps': 25.0,
-                        'start': float(mint),
-                        'end': float(maxt),
-                    }
+        for joint, skel, char in samkit.unreal_skeletons():
+            anim = '{project}_{tag}_{name}_{family}_{char}'.format(**locals())
+            chars.append(skel)
+            anims.append(anim)
+            instance.data['message'] = {
+                'stage': task['stage'],
+                'source': '%s/%s.fbx' % (path, anim),
+                'target': '/Game/%s' % task['path'].split(';')[1],
+                'skeleton': skel,
+                'shot': {
+                    'fps': 25.0,
+                    'start': float(mint),
+                    'end': float(maxt),
                 }
-                namespace = ':'+':'.join(joint.split(':')[:-1])
-                contents = cmds.namespaceInfo(namespace, listNamespace=True)
-                contents = [obj.split(':')[-1] for obj in contents]
-                try: cmds.parent(joint, world=True)
-                except RuntimeError: pass
-                cmds.select(joint, r=True)
-                if namespace != ':':
-                    cmds.namespace(removeNamespace=namespace, mergeNamespaceWithRoot=True)
-                mel.eval('FBXExport -f "%s" -s' % instance.data['message']['source'])
-                samkit.ue_remote(instance.data['message'])
-                cmds.select(contents, r=True)
-                cmds.delete()
-            except ValueError:
-                continue
+            }
+            namespace = ':'+':'.join(joint.split(':')[:-1])
+            contents = cmds.namespaceInfo(namespace, listNamespace=True)
+            contents = [obj.split(':')[-1] for obj in contents]
+            try: cmds.parent(joint, world=True)
+            except RuntimeError: pass
+            cmds.select(joint, r=True)
+            if namespace != ':':
+                cmds.namespace(removeNamespace=namespace, mergeNamespaceWithRoot=True)
+            mel.eval('FBXExport -f "%s" -s' % instance.data['message']['source'])
+            samkit.ue_remote(instance.data['message'])
+            cmds.select(contents, r=True)
+            cmds.delete()
 
         try:
-            assert not solo_export
+            assert not cmds.optionVar(q='mtou_solo_export')
             instance.data['message'] = {
                 'stage': 'cam',
                 'source': '{path}/{project}_{tag}_{name}_{family}_MainCam_S{mins}_E{maxs}.fbx'.format(**locals()),

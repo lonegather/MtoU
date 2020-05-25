@@ -62,6 +62,7 @@ class DockerMain(Docker):
         self.ui.tb_sync.setIcon(QIcon('%s/icons/sync.png' % samkit.MODULE_PATH))
         self.ui.tb_merge.setIcon(QIcon('%s/icons/merge.png' % samkit.MODULE_PATH))
         self.ui.tb_revert.setIcon(QIcon('%s/icons/revert.png' % samkit.MODULE_PATH))
+        self.ui.tb_solo.setIcon(QIcon('%s/icons/export.png' % samkit.MODULE_PATH))
         self.ui.tb_camera.setIcon(QIcon('%s/icons/camera.png' % samkit.MODULE_PATH))
 
         genus_model.dataChanged.connect(self.refresh_repository_genus)

@@ -263,6 +263,19 @@ def reference(task):
     cmds.file(loadReference=node)
 
 
+def unreal_skeletons():
+    solo_export = cmds.optionVar(q='mtou_solo_export')
+    for joint in cmds.ls(type='joint'):
+        try:
+            char = joint.split(':')[0]
+            skel = cmds.getAttr('%s.UE_Skeleton' % joint)
+            if not skel.count(solo_export):
+                continue
+            yield joint, skel, char
+        except ValueError:
+            continue
+
+
 def get_confirm(message, icon='question', choose=True):
     kwargs = {
         'title': 'Confirm',
