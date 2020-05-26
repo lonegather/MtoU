@@ -269,7 +269,7 @@ def unreal_skeletons():
         try:
             char = joint.split(':')[0]
             skel = cmds.getAttr('%s.UE_Skeleton' % joint)
-            if not skel.count(solo_export):
+            if not char.count(solo_export):
                 continue
             yield joint, skel, char
         except ValueError:

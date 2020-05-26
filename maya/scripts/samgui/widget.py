@@ -283,10 +283,23 @@ class DockerMain(Docker):
         self.ui.tb_revert.setEnabled(False)
         self.ui.tb_sync.setEnabled(False)
         self.ui.tb_camera.setEnabled(True)
+        self.ui.tb_solo.setEnabled(False)
         while self.ui.lw_task.count():
             self.ui.lw_task.takeItem(0)
         if not samkit.hasenv(samkit.OPT_USERNAME):
             return
+
+        menu = QMenu(self.ui.tb_solo)
+        task = samkit.get_context()
+        self.ui.tb_solo.setMenu(menu)
+        for joint, skel, char in samkit.unreal_skeletons():
+            if char == 'UnrealRoot': continue
+            action = QAction(char, self)
+            action.triggered.connect(
+                lambda *_: samkit.checkin([task], solo_export=char) or self.ui.tv_plugin.model().extract()
+            )
+            menu.addAction(action)
+            self.ui.tb_solo.setEnabled(True)
 
         data = samkit.get_data('task', owner=samkit.getenv(samkit.OPT_USERNAME))
         for task in data:
