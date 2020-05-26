@@ -236,7 +236,7 @@ class PluginModel(QStandardItemModel):
         return pyblish.util.extract(context)
 
     def integrate(self, comment):
-        context = self.extract() if self._task['tag'] != 'SC' else self.validate()
+        context = self.validate()
         context.data['comment'] = comment
         return pyblish.util.integrate(context)
 
