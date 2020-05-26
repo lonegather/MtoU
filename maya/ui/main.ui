@@ -560,7 +560,7 @@
         <item>
          <widget class="QPushButton" name="btn_export">
           <property name="text">
-           <string>Send to UE</string>
+           <string>Reset UE sequencer</string>
           </property>
          </widget>
         </item>
