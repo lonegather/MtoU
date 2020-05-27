@@ -297,20 +297,17 @@ class DockerMain(Docker):
             self.ui.lw_task.addItem(item)
             self.ui.lw_task.setItemWidget(item, item.widget)
 
-        try:
-            menu = QMenu(self.ui.tb_solo)
-            task = samkit.get_context()
-            self.ui.tb_solo.setMenu(menu)
-            for joint, skel, char in samkit.unreal_skeletons():
-                if char == 'UnrealRoot': continue
-                action = QAction(char, self)
-                action.triggered.connect(
-                    lambda *_: samkit.checkin([task], solo_export=char) or self.ui.tv_plugin.model().extract()
-                )
-                menu.addAction(action)
-                self.ui.tb_solo.setEnabled(True)
-        except Exception as e:
-            print(e)
+        menu = QMenu(self.ui.tb_solo)
+        task = samkit.get_context()
+        self.ui.tb_solo.setMenu(menu)
+        for joint, skel, char in samkit.unreal_skeletons():
+            if char == 'UnrealRoot': continue
+            action = QAction(char, self)
+            action.triggered.connect(
+                lambda *_: samkit.checkin([task], solo_export=char) or self.ui.tv_plugin.model().extract()
+            )
+            menu.addAction(action)
+            self.ui.tb_solo.setEnabled(True)
 
     def checkout_repository(self, task):
         if samkit.checkout(task):

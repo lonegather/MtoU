@@ -89,9 +89,12 @@ def get_context(key=None):
     empty_map = {
         'reference': []
     }
-    task_info = cmds.fileInfo('mtou_context', q=True)
-    task_info = task_info[0].replace(r'\"', '"').replace(r'\\\\', r'\\') if task_info else '{}'
-    task = json.loads(task_info)
+    try:
+        task_info = cmds.fileInfo('mtou_context', q=True)
+        task_info = task_info[0].replace(r'\"', '"').replace(r'\\\\', r'\\')
+        task = json.loads(task_info)
+    except (IndexError, ValueError):
+        return None if key else {}
     return task.get(key, empty_map.get(key, None)) if key else task
 
 
@@ -269,11 +272,11 @@ def unreal_skeletons():
         try:
             char = joint.split(':')[0]
             skel = cmds.getAttr('%s.UE_Skeleton' % joint)
-            if not char.count(solo_export):
-                continue
-            yield joint, skel, char
-        except ValueError:
+            assert char.count(solo_export)
+        except (AssertionError, TypeError, ValueError) as e:
+            print(e)
             continue
+        yield joint, skel, char
 
 
 def get_confirm(message, icon='question', choose=True):
