@@ -289,6 +289,14 @@ class DockerMain(Docker):
         if not samkit.hasenv(samkit.OPT_USERNAME):
             return
 
+        data = samkit.get_data('task', owner=samkit.getenv(samkit.OPT_USERNAME))
+        for task in data:
+            item = TaskItem(task, self)
+            item.setSizeHint(item.widget.sizeHint())
+            item.setFlags(item.flags() & ~Qt.ItemIsSelectable)
+            self.ui.lw_task.addItem(item)
+            self.ui.lw_task.setItemWidget(item, item.widget)
+
         menu = QMenu(self.ui.tb_solo)
         task = samkit.get_context()
         self.ui.tb_solo.setMenu(menu)
@@ -300,14 +308,6 @@ class DockerMain(Docker):
             )
             menu.addAction(action)
             self.ui.tb_solo.setEnabled(True)
-
-        data = samkit.get_data('task', owner=samkit.getenv(samkit.OPT_USERNAME))
-        for task in data:
-            item = TaskItem(task, self)
-            item.setSizeHint(item.widget.sizeHint())
-            item.setFlags(item.flags() & ~Qt.ItemIsSelectable)
-            self.ui.lw_task.addItem(item)
-            self.ui.lw_task.setItemWidget(item, item.widget)
 
     def checkout_repository(self, task):
         if samkit.checkout(task):
