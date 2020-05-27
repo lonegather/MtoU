@@ -69,13 +69,14 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
 
         if not os.path.exists(path):
             os.makedirs(path)
-
+        '''
         for ref in cmds.ls(type='reference'):
             if ref != 'sharedReferenceNode':
                 try:
                     cmds.file(importReference=True, referenceNode=ref)
                 except RuntimeError:
                     continue
+        '''
 
         mel.eval('FBXExportAnimationOnly -v false;')
         mel.eval('FBXExportApplyConstantKeyReducer -v false;')
@@ -121,18 +122,15 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
                     'end': float(maxt),
                 }
             }
-            namespace = ':'+':'.join(joint.split(':')[:-1])
+            namespace = ':'.join(joint.split(':')[:-1])
             contents = cmds.namespaceInfo(namespace, listNamespace=True)
-            contents = [obj.split(':')[-1] for obj in contents]
-            try: cmds.parent(joint, world=True)
-            except RuntimeError: pass
+            # try: cmds.parent(joint, world=True)
+            # except RuntimeError: pass
             cmds.select(joint, r=True)
-            if namespace != ':':
-                cmds.namespace(removeNamespace=namespace, mergeNamespaceWithRoot=True)
+            cmds.namespace(rename=[namespace, 'IMPORT'])
             mel.eval('FBXExport -f "%s" -s' % instance.data['message']['source'])
             samkit.ue_remote(instance.data['message'])
-            cmds.select(contents, r=True)
-            cmds.delete()
+            cmds.namespace(rename=['IMPORT', namespace])
 
         try:
             assert not cmds.optionVar(q='mtou_solo_export')
@@ -192,8 +190,7 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
             mel.eval('FBXExportApplyConstantKeyReducer -v false;')
             mel.eval('FBXExport -f "%s" -s' % instance.data['message']['source'])
             samkit.ue_remote(instance.data['message'])
+            cmds.delete()
 
         except (ValueError, AssertionError):
             pass
-        finally:
-            samkit.open_file(task, True)

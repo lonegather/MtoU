@@ -1,8 +1,6 @@
 import os
 import json
 import pickle
-import socket
-from socket import error
 import requests
 from requests.exceptions import ConnectionError
 from maya import cmds

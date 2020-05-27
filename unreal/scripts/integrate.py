@@ -202,19 +202,22 @@ def setup_sequencer(source, target, shot):
 
 def main():
     option_file = sys.argv[1]
-    unreal.log_warning(option_file)
     with open(option_file) as option:
         data = json.load(option)
         data['target'] = data['target'][:-1] if data['target'][-1] in ['\\', '/'] else data['target']
 
-    print('-' * 80)
+    print('=' * 120)
     for k, v in data.items():
-        print('[%s] --- %s' % (k, v))
+        print('| [%s] --- %s' % (k, v))
+    print('-' * 120)
 
     if data['stage'] != 'cam':
         import_fbx(data)
     else:
         setup_sequencer(data['source'], data['target'], data['shot'])
+
+    print('| Successfully imported.')
+    print('=' * 120)
 
 
 if __name__ == '__main__':

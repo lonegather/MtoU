@@ -228,7 +228,6 @@ class PluginModel(QStandardItemModel):
     def extract(self):
         context = self.validate()
         for result in context.data['results']:
-            print(result)
             if not result['success']:
                 if samkit.get_confirm('Validation failed, export anyway?', 'warning'):
                     return pyblish.util.extract(pyblish.util.collect())

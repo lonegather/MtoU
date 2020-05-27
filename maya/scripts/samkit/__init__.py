@@ -273,8 +273,7 @@ def unreal_skeletons():
             char = joint.split(':')[0]
             skel = cmds.getAttr('%s.UE_Skeleton' % joint)
             assert char.count(solo_export)
-        except (AssertionError, TypeError, ValueError) as e:
-            print(e)
+        except (AssertionError, TypeError, ValueError):
             continue
         yield joint, skel, char
 
