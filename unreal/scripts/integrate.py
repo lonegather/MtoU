@@ -134,6 +134,7 @@ def setup_sequencer(source, target, shot):
         package_paths=['/Game/'],
         recursive_paths=True,
     )
+
     # This is all the blueprint assets need to be put in the current shot level
     sequence_assets = get_assets_by_class('AnimSequence')
     bp_assets = [bp_data.get_asset() for bp_data in bp_assets_data if bp_data.asset_name in shot['chars']]
@@ -141,8 +142,8 @@ def setup_sequencer(source, target, shot):
 
     for asset in bp_assets:
         for sequence_asset in [asset_data.get_asset() for asset_data in sequence_assets]:
-            if sequence_asset.get_name().count(asset.get_name()):
-                break
+            if not sequence_asset.get_name() in shot['anims']: continue
+            if sequence_asset.get_name().endswith(asset.get_name()): break
         else:
             unreal.log_error('AnimSequence for \'%s\' does not exist.' % asset.get_name())
             return

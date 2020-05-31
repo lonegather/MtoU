@@ -253,7 +253,7 @@ def checkin(submit_list, solo_export=''):
 
 def reference(task):
     context = get_context()
-    refs = get_context('reference')
+    refs = get_context('reference') or list()
     refs.append(task['id'])
     context['reference'] = refs
     cmds.fileInfo('mtou_context', json.dumps(context))
@@ -266,16 +266,59 @@ def reference(task):
     cmds.file(loadReference=node)
 
 
-def unreal_skeletons():
+def unreal_skeletons(build_proxy=False):
     solo_export = cmds.optionVar(q='mtou_solo_export')
     for joint in cmds.ls(type='joint'):
         try:
             char = joint.split(':')[0]
             skel = cmds.getAttr('%s.UE_Skeleton' % joint)
+            root = joint
             assert char.count(solo_export)
-        except (AssertionError, TypeError, ValueError):
-            continue
-        yield joint, skel, char
+
+            if build_proxy:
+                # create proxy bones
+                root = cmds.duplicate(joint, returnRootsOnly=True)[0]
+                proxy = cmds.rename(root, 'UnrealRootProxy')
+                cmds.joint(name=root)
+                for kwargs_query in [
+                    {'rotateAxis': True},
+                    {'rotatePivot': True},
+                    {'rotation': True},
+                    {'scale': True},
+                    {'translation': True},
+                ]:
+                    value = cmds.xform(proxy, q=True, ws=True, **kwargs_query)
+                    kwargs_edit = {kwargs_query.keys()[0]: value}
+                    cmds.xform(root, ws=True, **kwargs_edit)
+                cmds.parentConstraint(joint, root, maintainOffset=True)
+                cmds.scaleConstraint(joint, root, maintainOffset=True)
+                children = cmds.listRelatives(proxy, children=True)
+                cmds.parent(children, root)
+                cmds.delete(proxy)
+                for child in cmds.listRelatives(root, allDescendents=True, type='joint'):
+                    cmds.parentConstraint('%s:%s' % (char, child), child, maintainOffset=True)
+                    cmds.scaleConstraint('%s:%s' % (char, child), child, maintainOffset=True)
+                for bs in cmds.ls(type='blendShape'):
+                    if not bs.startswith(char): continue
+                    for plug in cmds.listConnections('%s.weight' % bs, connections=True, p=True) or list():
+                        if bs.startswith(joint): continue
+                        if plug.find('%s.' % bs) == 0:
+                            attr = plug[(len(bs) + 1):]
+                            dest = '%s.%s' % (root, attr)
+                            try:
+                                cmds.getAttr(dest)
+                            except ValueError:
+                                cmds.addAttr(root, ln=attr, at='double', dv=0)
+                                cmds.setAttr(dest, keyable=True)
+                                cmds.connectAttr(plug, dest, f=True)
+
+        except (AssertionError, TypeError, ValueError): continue
+        try: yield root, skel, char
+        except GeneratorExit: pass
+
+        if build_proxy:
+            # clean up proxy bones
+            cmds.delete(root)
 
 
 def get_confirm(message, icon='question', choose=True):
@@ -320,4 +363,3 @@ def set_time_range():
     maxt = int(cmds.playbackOptions(q=1, max=1))
     offset = 101 - ast
     cmds.playbackOptions(min=mint+offset, max=maxt+offset, ast=ast+offset, aet=aet+offset)
-

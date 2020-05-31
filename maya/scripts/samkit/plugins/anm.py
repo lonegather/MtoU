@@ -69,14 +69,6 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
 
         if not os.path.exists(path):
             os.makedirs(path)
-        '''
-        for ref in cmds.ls(type='reference'):
-            if ref != 'sharedReferenceNode':
-                try:
-                    cmds.file(importReference=True, referenceNode=ref)
-                except RuntimeError:
-                    continue
-        '''
 
         mel.eval('FBXExportAnimationOnly -v false;')
         mel.eval('FBXExportApplyConstantKeyReducer -v false;')
@@ -107,7 +99,7 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
         chars = []
         anims = []
         family = instance.data['family']
-        for joint, skel, char in samkit.unreal_skeletons():
+        for joint, skel, char in samkit.unreal_skeletons(build_proxy=True):
             anim = '{project}_{tag}_{name}_{family}_{char}'.format(**locals())
             chars.append(skel)
             anims.append(anim)
@@ -122,15 +114,10 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
                     'end': float(maxt),
                 }
             }
-            namespace = ':'.join(joint.split(':')[:-1])
-            contents = cmds.namespaceInfo(namespace, listNamespace=True)
-            # try: cmds.parent(joint, world=True)
-            # except RuntimeError: pass
+            cmds.bakeResults('%s*' % joint, hierarchy='both', t=(mint, maxt))
             cmds.select(joint, r=True)
-            cmds.namespace(rename=[namespace, 'IMPORT'])
             mel.eval('FBXExport -f "%s" -s' % instance.data['message']['source'])
             samkit.ue_remote(instance.data['message'])
-            cmds.namespace(rename=['IMPORT', namespace])
 
         try:
             assert not cmds.optionVar(q='mtou_solo_export')
