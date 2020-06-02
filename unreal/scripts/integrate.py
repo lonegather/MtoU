@@ -140,19 +140,24 @@ def setup_sequencer(source, target, shot):
     bp_assets = [bp_data.get_asset() for bp_data in bp_assets_data if bp_data.asset_name in shot['chars']]
     all_actors = unreal.EditorLevelLibrary.get_all_level_actors()
 
-    for asset in bp_assets:
+    for char, anim in zip(shot['chars'], shot['anims']):
         for sequence_asset in [asset_data.get_asset() for asset_data in sequence_assets]:
-            if not sequence_asset.get_name() in shot['anims']: continue
-            if sequence_asset.get_name().endswith(asset.get_name()): break
+            if sequence_asset.get_name() == anim: break
         else:
-            unreal.log_error('AnimSequence for \'%s\' does not exist.' % asset.get_name())
+            unreal.log_error('AnimSequence for \'%s\' does not exist.' % char)
+            return
+
+        for asset in bp_assets:
+            if char.startswith(asset.get_name()): break
+        else:
+            unreal.log_error('SkeletalMesh for \'%s\' does not exist.' % char)
             return
 
         for actor in all_actors:
-            if actor.get_name().count(asset.get_name()):
-                break
+            if char == actor.get_name(): break
         else:
             actor = spawn_actor_from_object(asset)
+            actor.set_actor_label(char)
 
         binding = level_sequence.add_possessable(actor.get_component_by_class(unreal.SkeletalMeshComponent))
         anim_track = unreal.MovieSceneBindingExtensions.add_track(binding, unreal.MovieSceneSkeletalAnimationTrack)

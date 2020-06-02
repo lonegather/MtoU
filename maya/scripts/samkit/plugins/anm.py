@@ -101,7 +101,7 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
         family = instance.data['family']
         for joint, skel, char in samkit.unreal_skeletons(build_proxy=True):
             anim = '{project}_{tag}_{name}_{family}_{char}'.format(**locals())
-            chars.append(skel)
+            chars.append(char)
             anims.append(anim)
             instance.data['message'] = {
                 'stage': task['stage'],
@@ -114,7 +114,7 @@ class AnimationExtractor(pyblish.api.InstancePlugin):
                     'end': float(maxt),
                 }
             }
-            cmds.bakeResults('%s*' % joint, hierarchy='both', t=(mint, maxt))
+            cmds.bakeResults('%s*' % joint, hierarchy='below', t=(mint, maxt))
             cmds.select(joint, r=True)
             mel.eval('FBXExport -f "%s" -s' % instance.data['message']['source'])
             samkit.ue_remote(instance.data['message'])
