@@ -293,7 +293,7 @@ def unreal_skeletons(build_proxy=False):
                 cmds.parentConstraint(joint, root, maintainOffset=True)
                 cmds.scaleConstraint(joint, root, maintainOffset=True)
                 children = cmds.listRelatives(proxy, children=True)
-                cmds.parent(children, root)
+                cmds.parent(children, root, relative=True)
                 cmds.delete(proxy)
                 for child in cmds.listRelatives(root, allDescendents=True, type='joint'):
                     cmds.parentConstraint('%s:%s' % (char, child), child, maintainOffset=True)
