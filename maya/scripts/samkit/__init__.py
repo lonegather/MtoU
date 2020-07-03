@@ -20,6 +20,7 @@ __all__ = [
     'ue_remote',
     'getenv',
     'hasenv',
+    'get_scene_path',
     'local_path_exists',
     'source_path_exists',
     'get_local_path',
@@ -63,6 +64,10 @@ def getenv(key):
 
 def hasenv(key):
     return cmds.optionVar(exists=key)
+
+
+def get_scene_path():
+    return cmds.file(q=True, sn=True).replace('/', '\\')
 
 
 def local_path_exists(task):
@@ -130,7 +135,7 @@ def new_file():
 
 def open_file(task, force=False):
     current_id = get_context('id')
-    if task['id'] == current_id and not force:
+    if task['id'] == current_id and get_local_path(task) == get_scene_path() and not force:
         return
 
     local_path = get_local_path(task)

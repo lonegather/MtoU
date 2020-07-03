@@ -472,7 +472,7 @@ class TaskItem(QListWidgetItem):
 
     def update_icon(self, context=None):
         if samkit.local_path_exists(self._data):
-            if context == self._data['id']:
+            if context == self._data['id'] and samkit.get_local_path(self._data) == samkit.get_scene_path():
                 if self._data['stage'] not in ['lyt', 'anm']:
                     self._widget.ui.tb_camera.setEnabled(False)
                 else:
